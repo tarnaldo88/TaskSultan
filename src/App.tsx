@@ -1,12 +1,8 @@
-import React from 'react';
+import React from 'react'
+import { AuthForm } from './components/auth/AuthForm'
 
 function App() {
-  return (
-    <div className="App">
-      <h1>Welcome to TaskSultan</h1>
-      <p>Your modern SaaS task management app.</p>
-    </div>
-  );
+  return <AuthForm />
 }
 
-export default App;
+export default App

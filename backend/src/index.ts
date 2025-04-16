@@ -5,6 +5,7 @@ import authRoutes from './routes/authRoutes'
 import userRoutes from './routes/userRoutes'
 import workspaceRoutes from './routes/workspaceRoutes'
 import projectRoutes from './routes/projectRoutes'
+import taskRoutes from './routes/taskRoutes'
 
 // Load environment variables from .env file
 dotenv.config()
@@ -21,6 +22,8 @@ app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/workspaces', workspaceRoutes)
 app.use('/api/projects', projectRoutes)
+app.use('/api/projects/:projectId/tasks', taskRoutes)
+app.use('/api/tasks', taskRoutes)
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console
