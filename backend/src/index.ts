@@ -1,6 +1,8 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import authRoutes from './routes/authRoutes'
+import userRoutes from './routes/userRoutes'
 
 // Load environment variables from .env file
 dotenv.config()
@@ -12,6 +14,9 @@ app.use(cors())
 app.use(express.json())
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', message: 'TaskSultan backend running' }))
+
+app.use('/api/auth', authRoutes)
+app.use('/api/user', userRoutes)
 
 app.listen(port, () => {
   // eslint-disable-next-line no-console
