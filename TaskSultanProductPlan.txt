@@ -1,0 +1,87 @@
+Product Overview
+App Name: Task Sultan
+Type: SaaS Web Application
+Purpose: To provide teams and individuals with a collaborative platform for creating, assigning, and tracking tasks through their lifecycle, similar to Jira but with a focus on simplicity, modern UX, and extensibility.
+
+Core Features
+1. User Management
+Sign Up/Sign In: Email/password, OAuth (Google, Microsoft, etc.)
+User Roles: Admin, Member, Guest
+Profile Management: Name, avatar, email, notification preferences
+2. Workspace & Project Management
+Workspaces: Logical grouping for organizations/teams
+Projects: Each workspace can have multiple projects
+Project Settings: Name, description, members, permissions
+3. Task Management
+Task Creation: Title, description, priority, due date, attachments
+Task Assignment: Assign to one or more users
+Task States: Customizable (default: To Do, In Progress, Done)
+Task Comments: Threaded discussions, @mentions
+Task History: Audit log of changes
+Subtasks: Hierarchical tasks
+Labels/Tags: For filtering and categorization
+4. Task Views
+Kanban Board: Drag-and-drop tasks between states/columns
+List View: Tabular view with filtering/sorting
+Calendar View: Tasks by due date
+5. Notifications & Activity Feed
+In-app Notifications: Task assignment, comments, status changes
+Email Notifications: Configurable by user
+Activity Feed: Recent activity per project/workspace
+6. Search & Filters
+Global Search: Tasks, users, projects
+Advanced Filters: By assignee, status, label, due date, etc.
+7. Integrations (Phase 2+)
+API Access: REST API for external integrations
+Webhooks: For external automation
+Third-party Integrations: Slack, email, calendar, etc.
+Technical Specification
+Frontend
+Framework: React (with TypeScript)
+UI Library: Material UI or Chakra UI
+State Management: Redux Toolkit or React Query
+Routing: React Router
+Testing: Jest, React Testing Library
+Backend
+Framework: Node.js (Express or NestJS)
+Database: PostgreSQL (relational, for tasks, users, projects)
+ORM: Prisma or TypeORM
+Authentication: JWT, OAuth
+API: REST (GraphQL optional for future)
+File Storage: AWS S3 or similar for attachments
+Real-Time: WebSockets or Pusher for live updates
+DevOps & Infrastructure
+Hosting: AWS/GCP/Azure (Dockerized deployment)
+CI/CD: GitHub Actions or GitLab CI
+Monitoring: Sentry, Datadog
+Environment: Staging & Production
+Data Model (Simplified)
+User: id, name, email, password_hash, avatar_url, role
+Workspace: id, name, owner_id, created_at
+Project: id, name, workspace_id, description, created_at
+Task: id, title, description, status, assignee_id, project_id, created_at, due_date, priority, parent_task_id
+Comment: id, task_id, user_id, content, created_at
+Attachment: id, task_id, url, uploaded_by, uploaded_at
+Label: id, name, color, workspace_id
+User Stories (MVP)
+As a user, I can sign up and create a workspace.
+As a workspace admin, I can invite members to my workspace.
+As a member, I can create projects within my workspace.
+As a project member, I can create, assign, and update tasks.
+As a user, I can view tasks in a Kanban board and move them between states.
+As a user, I receive notifications when tasks are assigned to me or commented on.
+As a user, I can search and filter tasks by various criteria.
+MVP Roadmap
+User Auth & Workspace Setup
+Project & Task CRUD
+Kanban Board UI
+Task Assignment & State Management
+Comments & Notifications
+Basic Search & Filters
+Deployment & Onboarding
+Stretch Goals (Post-MVP)
+Custom workflows and automations
+Gantt chart view
+Reporting and analytics dashboard
+Mobile app (React Native)
+Marketplace for plugins/extensions
