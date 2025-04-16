@@ -2,6 +2,8 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom'
 import { AuthForm } from './components/auth/AuthForm'
 import { useAuth } from './store/authContext'
+import { listProjects } from './services/project'
+import type { Project } from './types/project'
 
 function Dashboard() {
   const { user, logout } = useAuth()
@@ -18,12 +20,36 @@ function Dashboard() {
 }
 
 function Projects() {
+  const { user, token } = useAuth()
+  const [projects, setProjects] = React.useState<Project[]>([])
+  const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
+
+  // For demo, assume workspaceId is user's first workspace or a static string
+  const workspaceId = user?.workspaces?.[0]?.id || 'demo-workspace-id'
+
+  React.useEffect(() => {
+    if (!workspaceId || !token) return
+    setLoading(true)
+    listProjects({ workspaceId, token })
+      .then(setProjects)
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false))
+  }, [workspaceId, token])
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-muted">
       <NavBar />
       <div className="bg-white rounded shadow p-8 w-full max-w-md mt-8">
         <h1 className="text-2xl font-bold mb-4">Projects</h1>
-        <p className="mb-4">Project list and management coming soon.</p>
+        {loading && <div>Loading projects...</div>}
+        {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+        <ul className="space-y-2">
+          {projects.map(p => (
+            <li key={p.id} className="border rounded px-3 py-2">{p.name}</li>
+          ))}
+        </ul>
+        {!loading && !error && projects.length === 0 && <div>No projects found.</div>}
       </div>
     </div>
   )
