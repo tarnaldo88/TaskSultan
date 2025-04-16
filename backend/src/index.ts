@@ -7,6 +7,7 @@ import workspaceRoutes from './routes/workspaceRoutes'
 import projectRoutes from './routes/projectRoutes'
 import taskRoutes from './routes/taskRoutes'
 import commentRoutes from './routes/commentRoutes'
+import labelRoutes from './routes/labelRoutes'
 
 // Load environment variables from .env file
 dotenv.config()
@@ -26,6 +27,7 @@ app.use('/api/projects', projectRoutes)
 app.use('/api/projects/:projectId/tasks', taskRoutes)
 app.use('/api/tasks', taskRoutes)
 app.use('/api', commentRoutes)
+app.use('/api', labelRoutes)
 
 // Export the app for testing
 export default app
