@@ -27,6 +27,9 @@ app.use('/api/projects/:projectId/tasks', taskRoutes)
 app.use('/api/tasks', taskRoutes)
 app.use('/api', commentRoutes)
 
+// Export the app for testing
+export default app
+
 app.listen(port, () => {
   // eslint-disable-next-line no-console
   console.log(`TaskSultan backend listening on port ${port}`)
