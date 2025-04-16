@@ -1,66 +1,117 @@
-import React, { useState } from 'react'
-import { useAuth } from '../store/authContext'
+import React from 'react'
+import { useAuth } from '../../store/authContext'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+
+const loginSchema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6)
+})
+
+const registerSchema = loginSchema.extend({
+  name: z.string().min(2)
+})
+
+type LoginInput = z.infer<typeof loginSchema>
+type RegisterInput = z.infer<typeof registerSchema>
 
 function AuthForm() {
   const { login, register, isLoading, error, user } = useAuth()
-  const [mode, setMode] = useState<'login' | 'register'>('login')
-  const [form, setForm] = useState({ name: '', email: '', password: '' })
+  const [tab, setTab] = React.useState<'login' | 'register'>('login')
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setForm(f => ({ ...f, [e.target.name]: e.target.value }))
+  const loginForm = useForm<LoginInput>({ resolver: zodResolver(loginSchema) })
+  const registerForm = useForm<RegisterInput>({ resolver: zodResolver(registerSchema) })
+
+  async function handleLogin(data: LoginInput) {
+    await login(data)
   }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (mode === 'login') await login({ email: form.email, password: form.password })
-    else await register({ name: form.name, email: form.email, password: form.password })
+  async function handleRegister(data: RegisterInput) {
+    await register(data)
   }
 
   return (
-    <div className="max-w-sm mx-auto mt-20 p-8 bg-white rounded shadow">
-      <h1 className="text-2xl font-bold mb-4 text-center">{mode === 'login' ? 'Sign In' : 'Register'}</h1>
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
-        {mode === 'register' && (
-          <input
-            className="input input-bordered"
-            name="name"
-            placeholder="Name"
-            value={form.name}
-            onChange={handleChange}
-            required
-          />
-        )}
-        <input
-          className="input input-bordered"
-          name="email"
-          type="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          required
-        />
-        <input
-          className="input input-bordered"
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={form.password}
-          onChange={handleChange}
-          required
-        />
-        <button className="btn btn-primary w-full" type="submit" disabled={isLoading}>
-          {isLoading ? 'Loading...' : mode === 'login' ? 'Sign In' : 'Register'}
-        </button>
-        <button
-          type="button"
-          className="text-blue-600 text-sm mt-2"
-          onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
-        >
-          {mode === 'login' ? 'Need an account? Register' : 'Already have an account? Sign In'}
-        </button>
-        {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-        {user && <div className="text-green-600 text-sm text-center">Welcome, {user.name}</div>}
-      </form>
+    <div className="flex min-h-screen items-center justify-center bg-muted">
+      <Card className="w-full max-w-sm">
+        <CardHeader>
+          <CardTitle className="text-center text-2xl font-bold tracking-tight">
+            {tab === 'login' ? 'Sign In' : 'Register'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Tabs value={tab} onValueChange={v => setTab(v as 'login' | 'register')} className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
+              <TabsTrigger value="login">Sign In</TabsTrigger>
+              <TabsTrigger value="register">Register</TabsTrigger>
+            </TabsList>
+            <TabsContent value="login">
+              <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  {...loginForm.register('email')}
+                  disabled={isLoading}
+                />
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  {...loginForm.register('password')}
+                  disabled={isLoading}
+                />
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Signing in...' : 'Sign In'}
+                </Button>
+                {loginForm.formState.errors.email && (
+                  <div className="text-red-500 text-xs">{loginForm.formState.errors.email.message}</div>
+                )}
+                {loginForm.formState.errors.password && (
+                  <div className="text-red-500 text-xs">{loginForm.formState.errors.password.message}</div>
+                )}
+                {error && <div className="text-red-500 text-xs text-center">{error}</div>}
+              </form>
+            </TabsContent>
+            <TabsContent value="register">
+              <form onSubmit={registerForm.handleSubmit(handleRegister)} className="space-y-4">
+                <Input
+                  placeholder="Name"
+                  {...registerForm.register('name')}
+                  disabled={isLoading}
+                />
+                <Input
+                  type="email"
+                  placeholder="Email"
+                  {...registerForm.register('email')}
+                  disabled={isLoading}
+                />
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  {...registerForm.register('password')}
+                  disabled={isLoading}
+                />
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? 'Registering...' : 'Register'}
+                </Button>
+                {registerForm.formState.errors.name && (
+                  <div className="text-red-500 text-xs">{registerForm.formState.errors.name.message}</div>
+                )}
+                {registerForm.formState.errors.email && (
+                  <div className="text-red-500 text-xs">{registerForm.formState.errors.email.message}</div>
+                )}
+                {registerForm.formState.errors.password && (
+                  <div className="text-red-500 text-xs">{registerForm.formState.errors.password.message}</div>
+                )}
+                {error && <div className="text-red-500 text-xs text-center">{error}</div>}
+              </form>
+            </TabsContent>
+          </Tabs>
+          {user && <div className="text-green-600 text-center mt-4">Welcome, {user.name}</div>}
+        </CardContent>
+      </Card>
     </div>
   )
 }
