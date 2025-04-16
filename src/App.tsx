@@ -1,4 +1,5 @@
 import React from 'react'
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom'
 import { AuthForm } from './components/auth/AuthForm'
 import { useAuth } from './store/authContext'
 
@@ -6,7 +7,8 @@ function Dashboard() {
   const { user, logout } = useAuth()
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-muted">
-      <div className="bg-white rounded shadow p-8 w-full max-w-md">
+      <NavBar />
+      <div className="bg-white rounded shadow p-8 w-full max-w-md mt-8">
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
         <p className="mb-4">Welcome, <span className="font-semibold">{user?.name}</span>!</p>
         <button className="px-4 py-2 rounded bg-primary text-white" onClick={logout}>Logout</button>
@@ -15,10 +17,50 @@ function Dashboard() {
   )
 }
 
-function App() {
+function NavBar() {
   const { user } = useAuth()
-  if (!user) return <AuthForm />
-  return <Dashboard />
+  if (!user) return null
+  return (
+    <nav className="w-full flex items-center justify-between px-8 py-4 bg-card shadow">
+      <Link to="/dashboard" className="font-bold text-lg text-primary">TaskSultan</Link>
+      <div className="flex gap-4 items-center">
+        <Link to="/dashboard" className="text-primary">Dashboard</Link>
+        {/* Add more links here as you add features */}
+      </div>
+    </nav>
+  )
+}
+
+function AuthFormWithRedirect() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  React.useEffect(() => { if (user) navigate('/dashboard', { replace: true }) }, [user, navigate])
+  return <AuthForm />
+}
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth()
+  if (!user) return <Navigate to="/login" replace />
+  return <>{children}</>
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<AuthFormWithRedirect />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </BrowserRouter>
+  )
 }
 
 export default App
