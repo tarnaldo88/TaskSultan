@@ -11,65 +11,66 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  avatarUrl String?
-  role      String   // 'admin' | 'member' | 'guest'
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String            @id @default(uuid())
+  email      String            @unique
+  password   String
+  name       String
+  avatarUrl  String?
+  role       String
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
   workspaces WorkspaceMember[]
-  tasks      Task[] @relation("AssignedTasks")
+  assignedTasks Task[]         @relation("AssignedTasks")
   comments   Comment[]
 }
 
 model Workspace {
-  id        String   @id @default(uuid())
+  id        String            @id @default(uuid())
   name      String
   ownerId   String
-  createdAt DateTime @default(now())
+  createdAt DateTime          @default(now())
   projects  Project[]
   members   WorkspaceMember[]
+  labels    Label[]
 }
 
 model WorkspaceMember {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   userId      String
   workspaceId String
-  role        String   // 'admin' | 'member' | 'guest'
-  user        User     @relation(fields: [userId], references: [id])
+  role        String
+  user        User      @relation(fields: [userId], references: [id])
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 }
 
 model Project {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   name        String
   description String?
   workspaceId String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   tasks       Task[]
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
 }
 
 model Task {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   title       String
   description String?
-  status      String   // 'todo' | 'in-progress' | 'done' | ...
+  status      String
   priority    String?
   dueDate     DateTime?
   assigneeId  String?
   projectId   String
   parentTaskId String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  assignee    User?    @relation("AssignedTasks", fields: [assigneeId], references: [id])
-  project     Project  @relation(fields: [projectId], references: [id])
-  parentTask  Task?    @relation("Subtasks", fields: [parentTaskId], references: [id])
-  subtasks    Task[]   @relation("Subtasks")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  assignee    User?     @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  project     Project   @relation(fields: [projectId], references: [id])
+  parentTask  Task?     @relation("Subtasks", fields: [parentTaskId], references: [id])
+  subtasks    Task[]    @relation("Subtasks")
   comments    Comment[]
-  labels      Label[]  @relation("TaskLabels")
+  labels      Label[]   @relation("TaskLabels")
 }
 
 model Comment {
@@ -83,10 +84,10 @@ model Comment {
 }
 
 model Label {
-  id        String   @id @default(uuid())
-  name      String
-  color     String
+  id         String     @id @default(uuid())
+  name       String
+  color      String
   workspaceId String
-  tasks     Task[]   @relation("TaskLabels")
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  tasks      Task[]     @relation("TaskLabels")
+  workspace  Workspace  @relation(fields: [workspaceId], references: [id])
 }
