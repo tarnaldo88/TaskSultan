@@ -6,7 +6,7 @@ export interface AuthResponse {
 }
 
 export async function login({ email, password }: { email: string; password: string }): Promise<AuthResponse> {
-  const res = await fetch('/api/auth/login', {
+  const res = await fetch('http://localhost:4000/api/auth/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ email, password })
@@ -16,7 +16,7 @@ export async function login({ email, password }: { email: string; password: stri
 }
 
 export async function register({ name, email, password }: { name: string; email: string; password: string }): Promise<AuthResponse> {
-  const res = await fetch('/api/auth/register', {
+  const res = await fetch('http://localhost:4000/api/auth/register', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name, email, password })
@@ -26,7 +26,7 @@ export async function register({ name, email, password }: { name: string; email:
 }
 
 export async function fetchMe(token: string): Promise<User> {
-  const res = await fetch('/api/user/me', {
+  const res = await fetch('http://localhost:4000/api/user/me', {
     headers: { Authorization: `Bearer ${token}` }
   })
   if (!res.ok) throw new Error('Not authenticated')
