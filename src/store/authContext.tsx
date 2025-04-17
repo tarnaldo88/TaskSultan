@@ -21,7 +21,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const login = useCallback(async ({ email, password }) => {
+  const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
     setIsLoading(true)
     setError(null)
     try {
@@ -35,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const register = useCallback(async ({ name, email, password }) => {
+  const register = useCallback(async ({ name, email, password }: { name: string; email: string; password: string }) => {
     setIsLoading(true)
     setError(null)
     try {

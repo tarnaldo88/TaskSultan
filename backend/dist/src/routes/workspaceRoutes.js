@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const auth_1 = require("../middleware/auth");
+const workspaceController_1 = require("../controllers/workspaceController");
+const router = (0, express_1.Router)();
+router.use(auth_1.requireAuth);
+router.get('/', workspaceController_1.listWorkspaces);
+router.post('/', workspaceController_1.createWorkspace);
+router.get('/:id', workspaceController_1.getWorkspace);
+router.put('/:id', workspaceController_1.updateWorkspace);
+router.delete('/:id', workspaceController_1.deleteWorkspace);
+exports.default = router;

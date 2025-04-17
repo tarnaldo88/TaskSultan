@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
-import app from '../src/index'
+import app from '../index'
 
 const prisma = new PrismaClient()
 const JWT_SECRET = process.env.JWT_SECRET || 'testsecret'

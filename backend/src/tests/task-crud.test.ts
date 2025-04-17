@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
-import app from '../src/index'
+import app from '../index'
 import fs from 'fs'
 
 const prisma = new PrismaClient()
