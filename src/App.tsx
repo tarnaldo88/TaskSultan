@@ -176,15 +176,23 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 function DarkModeToggle() {
-  const [isDark, setIsDark] = React.useState(() =>
-    typeof window !== 'undefined' ? document.body.classList.contains('dark') : false
-  )
+  const [isDark, setIsDark] = React.useState(() => {
+    if (typeof window === 'undefined') return false
+    // Prefer localStorage, fallback to system
+    const ls = localStorage.getItem('theme')
+    if (ls) return ls === 'dark'
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+  })
 
   React.useEffect(() => {
-    const root = document.getElementById('root')
-    if (!root) return
-    if (isDark) root.classList.add('dark')
-    else root.classList.remove('dark')
+    const html = document.documentElement
+    if (isDark) {
+      html.classList.add('dark')
+      localStorage.setItem('theme', 'dark')
+    } else {
+      html.classList.remove('dark')
+      localStorage.setItem('theme', 'light')
+    }
   }, [isDark])
 
   return (

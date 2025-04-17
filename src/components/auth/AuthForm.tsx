@@ -50,17 +50,17 @@ function AuthForm() {
     <div className="relative min-h-screen w-full bg-white text-black transition-colors duration-300 dark:bg-gray-900 dark:text-white flex flex-col">
       {/* Header: Logo/Title left, Register button right */}
       <div className="flex flex-1 flex-col items-center justify-center w-full px-10 py-8 relative">
-        <div className="flex flex-col items-center w-full">
+        <div className="flex  items-center w-full">
           <img
             src="/img/LogoSultan.png"
             alt="TaskSultan Logo"
             width={125}
             height={125}
-            className="h-[125px] w-[125px] justify-center object-contain drop-shadow-lg my-8"
+            className="h-[125px] w-[125px] object-contain drop-shadow-lg my-8"
             draggable="false"
           />
           <span
-            className="text-[20rem] md:text-[20.5rem] lg:text-[45rem] font-extrabold tracking-tight text-black dark:text-white leading-none font-sans select-none drop-shadow-xl mt-4 text-center"
+            className="text-[20rem] md:text-[20.5rem] lg:text-[45rem] font-extrabold tracking-tight text-black dark:text-white leading-none font-sans select-none drop-shadow-xl mt-4"
             style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif', fontWeight: 700, margin: '20px', fontSize: 35, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
           >
             Task Sultan
