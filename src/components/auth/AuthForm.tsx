@@ -3,10 +3,10 @@ import { useAuth } from '../../store/authContext'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Input } from '../ui/input'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs'
+import { Button } from '../ui/button'
 
 const loginSchema = z.object({
   email: z.string().email(),
