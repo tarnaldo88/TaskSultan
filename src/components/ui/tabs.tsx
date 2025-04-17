@@ -45,7 +45,13 @@ function TabsTrigger({ value, children, className, ...props }: TabsTriggerProps)
     <button
       type="button"
       {...props}
-      className={cn('px-4 py-2 rounded', isActive ? 'bg-primary text-white' : 'bg-muted', className)}
+      className={cn(
+        // Distinct style for tab buttons: pill shape, smaller, muted bg, no shadow
+        'px-6 py-3 rounded-full font-medium text-base transition-colors duration-150',
+        isActive ? 'bg-blue-600 text-white dark:bg-blue-500 dark:text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700',
+        'focus:outline-none focus:ring-2 focus:ring-blue-400',
+        className
+      )}
       onClick={() => ctx.setTabValue(value)}
     >
       {children}

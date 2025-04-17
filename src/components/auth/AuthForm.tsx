@@ -47,22 +47,29 @@ function AuthForm() {
   }
 
   return (
-    <div className="relative min-h-screen w-screen bg-gradient-to-br from-gray-900 via-gray-950 to-gray-900 flex flex-col">
+    <div className="relative min-h-screen w-full bg-white text-black transition-colors duration-300 dark:bg-gray-900 dark:text-white flex flex-col">
       {/* Header: Logo/Title left, Register button right */}
-      <div className="flex items-center justify-between w-full px-10 py-8">
-        <div className="flex items-center gap-4">
+      <div className="flex flex-1 flex-col items-center justify-center w-full px-10 py-8 relative">
+        <div className="flex flex-col items-center w-full">
           <img
             src="/img/LogoSultan.png"
             alt="TaskSultan Logo"
-            className="h-[80px] w-[80px] object-contain drop-shadow-lg"
+            width={125}
+            height={125}
+            className="h-[125px] w-[125px] justify-center object-contain drop-shadow-lg my-8"
             draggable="false"
           />
-          <span className="text-4xl font-extrabold tracking-tight text-white">TaskSultan</span>
+          <span
+            className="text-[20rem] md:text-[20.5rem] lg:text-[45rem] font-extrabold tracking-tight text-black dark:text-white leading-none font-sans select-none drop-shadow-xl mt-4 text-center"
+            style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif', fontWeight: 700, margin: '20px', fontSize: 35, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          >
+            Task Sultan
+          </span>
         </div>
         {tab === 'login' && (
           <button
             type="button"
-            className="px-6 py-2 rounded-xl bg-gradient-to-r from-purple-600 via-blue-600 to-purple-700 hover:from-purple-700 hover:via-blue-700 hover:to-purple-800 text-white font-semibold shadow-lg shadow-purple-900/30 transition-all duration-200 border-0 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            className="absolute top-8 right-8 px-8 py-4 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-lg md:text-xl shadow-lg shadow-purple-900/30 transition-all duration-200 border-0 focus:ring-2 focus:ring-purple-400 focus:outline-none"
             onClick={() => setTab('register')}
           >
             Register
@@ -71,12 +78,14 @@ function AuthForm() {
       </div>
       {/* Centered Auth Card */}
       <div className="flex flex-1 items-center justify-center">
-        <Card className="w-full max-w-md shadow-2xl rounded-xl border-0 bg-gray-900/90 backdrop-blur-md flex flex-col items-center justify-center">
+        <Card className="w-full max-w-md shadow-2xl rounded-xl border-0 bg-white dark:bg-gray-900/90 backdrop-blur-md flex flex-col items-center justify-center">
           <CardContent className="w-full flex flex-col items-center justify-center">
             <Tabs value={tab} onValueChange={v => setTab(v as 'login' | 'register')} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-800 rounded-lg p-1">
-                <TabsTrigger value="login" className="rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-300">Sign In</TabsTrigger>
-                <TabsTrigger value="register" className="rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-300">Register</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-200 dark:bg-gray-800 rounded-lg p-1">
+                <TabsTrigger value="login" className="rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-gray-300">Sign In</TabsTrigger>
+                {tab !== 'login' && (
+                  <TabsTrigger value="register" className="rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-gray-300">Register</TabsTrigger>
+                )}
               </TabsList>
               <TabsContent value="login">
                 <form onSubmit={loginForm.handleSubmit(handleLogin)} className="flex flex-col items-center justify-center space-y-6">
@@ -86,7 +95,7 @@ function AuthForm() {
                       placeholder="Email"
                       {...loginForm.register('email')}
                       disabled={isLoading}
-                      className="bg-gray-950 border-gray-800 focus:ring-blue-500 text-white placeholder:text-gray-500 w-full text-center"
+                      className="bg-gray-950 dark:bg-gray-200 border-gray-800 dark:border-gray-300 focus:ring-blue-500 text-white dark:text-black placeholder:text-gray-500 dark:placeholder:text-gray-700 w-full text-center text-3xl py-6 px-8 rounded-2xl"
                     />
                   </div>
                   <div className="w-full flex flex-col items-center">
@@ -95,12 +104,12 @@ function AuthForm() {
                       placeholder="Password"
                       {...loginForm.register('password')}
                       disabled={isLoading}
-                      className="bg-gray-950 border-gray-800 focus:ring-blue-500 text-white placeholder:text-gray-500 w-full text-center"
+                      className="bg-gray-950 dark:bg-gray-200 border-gray-800 dark:border-gray-300 focus:ring-blue-500 text-white dark:text-black placeholder:text-gray-500 dark:placeholder:text-gray-700 w-full text-center text-3xl py-6 px-8 rounded-2xl"
                     />
                   </div>
                   <Button
                     type="submit"
-                    className="w-full mt-4 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-700 hover:from-purple-700 hover:via-blue-700 hover:to-purple-800 text-white font-semibold text-base py-2 rounded-xl shadow-lg shadow-purple-900/30 transition-all duration-200 border-0 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full mt-4 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-base py-2 shadow-lg shadow-purple-900/30 transition-all duration-200 border-0 focus:ring-2 focus:ring-purple-400 focus:outline-none"
                     disabled={isLoading}
                   >
                     {isLoading ? 'Signing in...' : 'Sign In'}
@@ -120,25 +129,25 @@ function AuthForm() {
                     placeholder="Name"
                     {...registerForm.register('name')}
                     disabled={isLoading}
-                    className="bg-gray-950 border-gray-800 focus:ring-blue-500 text-white placeholder:text-gray-500"
+                    className="bg-gray-950 dark:bg-gray-200 border-gray-800 dark:border-gray-300 focus:ring-blue-500 text-white dark:text-black placeholder:text-gray-500 dark:placeholder:text-gray-700"
                   />
                   <InputComponent
                     type="email"
                     placeholder="Email"
                     {...registerForm.register('email')}
                     disabled={isLoading}
-                    className="bg-gray-950 border-gray-800 focus:ring-blue-500 text-white placeholder:text-gray-500"
+                    className="bg-gray-950 dark:bg-gray-200 border-gray-800 dark:border-gray-300 focus:ring-blue-500 text-white dark:text-black placeholder:text-gray-500 dark:placeholder:text-gray-700"
                   />
                   <InputComponent
                     type="password"
                     placeholder="Password"
                     {...registerForm.register('password')}
                     disabled={isLoading}
-                    className="bg-gray-950 border-gray-800 focus:ring-blue-500 text-white placeholder:text-gray-500"
+                    className="bg-gray-950 dark:bg-gray-200 border-gray-800 dark:border-gray-300 focus:ring-blue-500 text-white dark:text-black placeholder:text-gray-500 dark:placeholder:text-gray-700"
                   />
                   <Button
                     type="submit"
-                    className="w-full mt-4 bg-gradient-to-r from-purple-600 via-blue-600 to-purple-700 hover:from-purple-700 hover:via-blue-700 hover:to-purple-800 text-white font-semibold text-base py-2 rounded-xl shadow-lg shadow-purple-900/30 transition-all duration-200 border-0 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                    className="w-full mt-4 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-base py-2 shadow-lg shadow-purple-900/30 transition-all duration-200 border-0 focus:ring-2 focus:ring-purple-400 focus:outline-none"
                     disabled={isLoading}
                   >
                     {isLoading ? 'Registering...' : 'Register'}

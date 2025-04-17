@@ -5,7 +5,13 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
 function Button(props: ButtonProps) {
   return (
-    <button {...props} className={cn('px-4 py-2 rounded bg-primary text-white font-medium disabled:opacity-50', props.className)} />
+    <button
+      {...props}
+      className={cn(
+        'px-8 py-4 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-lg md:text-xl shadow-lg shadow-purple-900/30 transition-all duration-200 border-0 focus:ring-2 focus:ring-purple-400 focus:outline-none disabled:opacity-50 dark:bg-purple-500 dark:hover:bg-purple-700 dark:text-white',
+        props.className
+      )}
+    />
   )
 }
 

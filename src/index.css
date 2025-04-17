@@ -5,11 +5,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  @apply bg-gray-900 text-white;
 }
 
 html {
-  background: #0a0a0a;
 }
 
 code {
@@ -17,34 +15,12 @@ code {
     monospace;
 }
 
-/* Remove light backgrounds from all elements */
-* {
-  background-color: transparent !important;
-  color-scheme: dark;
-}
+/* Removed global overrides for backgrounds, text, borders, and shadows to allow component-level styling */
 
-/* Remove any Tailwind base background utilities if present */
-.bg-white, .bg-gray-50, .bg-gray-100, .bg-blue-50, .bg-purple-50, .bg-pink-50 {
-  background-color: #18181b !important;
-}
-
-/* Optional: force dark border and text for all UI components */
-.border, .border-gray-200, .border-input {
-  border-color: #27272a !important;
-}
-.text-black, .text-gray-900, .text-gray-700, .text-gray-600 {
-  color: #f4f4f5 !important;
-}
-
-/* Optional: darken scrollbars */
-::-webkit-scrollbar {
+/* Dark mode scrollbars */
+.dark ::-webkit-scrollbar {
   background: #18181b;
 }
-::-webkit-scrollbar-thumb {
+.dark ::-webkit-scrollbar-thumb {
   background: #27272a;
-}
-
-/* Optional: remove box-shadows from light mode */
-.shadow, .shadow-md, .shadow-lg, .shadow-xl, .shadow-2xl {
-  box-shadow: 0 4px 32px 0 #000a !important;
 }
