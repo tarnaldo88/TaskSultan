@@ -1,13 +1,3 @@
-// Tell Jest to use Node environment
-declare global {
-  // eslint-disable-next-line no-var
-  var describe: typeof import('@jest/globals').describe
-  var beforeAll: typeof import('@jest/globals').beforeAll
-  var afterAll: typeof import('@jest/globals').afterAll
-  var it: typeof import('@jest/globals').it
-  var expect: typeof import('@jest/globals').expect
-}
-
 import request from 'supertest'
 import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'

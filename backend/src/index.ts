@@ -23,16 +23,18 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', message: 'TaskSult
 app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/workspaces', workspaceRoutes)
-app.use('/api/projects', projectRoutes)
-app.use('/api/projects/:projectId/tasks', taskRoutes)
-app.use('/api/tasks', taskRoutes)
+app.use('/api/workspaces', projectRoutes)
+app.use('/api', taskRoutes)
 app.use('/api', commentRoutes)
 app.use('/api', labelRoutes)
 
 // Export the app for testing
 export default app
 
-app.listen(port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`TaskSultan backend listening on port ${port}`)
-})
+// Only start server if run directly, not when imported for tests
+if (require.main === module) {
+  app.listen(port, () => {
+    // eslint-disable-next-line no-console
+    console.log(`TaskSultan backend listening on port ${port}`)
+  })
+}

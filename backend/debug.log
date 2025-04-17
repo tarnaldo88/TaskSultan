@@ -1,0 +1,28 @@
+Parent task: undefined
+Parent task before subtask: undefined
+Main task creation response: 404 {}
+Parent task before subtask: undefined
+Project creation response: 401 {"error":"Invalid or expired token"}
+Project creation response: 404 {}
+Project creation response: 404 {}
+Project creation response: 404 {}
+Workspace created: {"id":"9b096ad5-7180-475d-af5b-4f1ba0cc1401","name":"Task Workspace","ownerId":"ed4f0847-c804-4319-b600-29aedf0dc3fe","createdAt":"2025-04-17T01:09:14.326Z"}
+All workspaces: [{"id":"9b096ad5-7180-475d-af5b-4f1ba0cc1401","name":"Task Workspace","ownerId":"ed4f0847-c804-4319-b600-29aedf0dc3fe","createdAt":"2025-04-17T01:09:14.326Z"}]
+Project creation response: 404 {}
+Workspace created: {"id":"cd72aba6-1588-4db9-9e5c-f4b1702a0f29","name":"Task Workspace","ownerId":"423d4cca-b974-468d-abec-707636561a1a","createdAt":"2025-04-17T01:38:32.320Z"}
+All workspaces: [{"id":"cd72aba6-1588-4db9-9e5c-f4b1702a0f29","name":"Task Workspace","ownerId":"423d4cca-b974-468d-abec-707636561a1a","createdAt":"2025-04-17T01:38:32.320Z"}]
+Project creation response: 404 {}
+Workspace created: {"id":"3775e9ba-276c-4b61-9655-10a4f1a59b80","name":"Task Workspace","ownerId":"3e46f31b-5e5f-47ae-87de-e93dfee9d0f3","createdAt":"2025-04-17T01:39:26.677Z"}
+All workspaces: [{"id":"3775e9ba-276c-4b61-9655-10a4f1a59b80","name":"Task Workspace","ownerId":"3e46f31b-5e5f-47ae-87de-e93dfee9d0f3","createdAt":"2025-04-17T01:39:26.677Z"}]
+Project creation response: 201 {"project":{"id":"4beb06b5-6c5b-4bdd-b165-71f02ca6eec5","name":"Test Project","description":null,"workspaceId":"3775e9ba-276c-4b61-9655-10a4f1a59b80","createdAt":"2025-04-17T01:39:26.738Z"}}
+Project created: {"id":"4beb06b5-6c5b-4bdd-b165-71f02ca6eec5","name":"Test Project","description":null,"workspaceId":"3775e9ba-276c-4b61-9655-10a4f1a59b80","createdAt":"2025-04-17T01:39:26.738Z"}
+Main task creation response: 404 {}
+Parent task before subtask: undefined
+Workspace created: {"id":"b9afb999-cf05-4cf0-b872-08d91a03ddc3","name":"Task Workspace","ownerId":"3be4a8c7-f919-4376-8bb9-e0dac393f92e","createdAt":"2025-04-17T01:42:47.292Z"}
+All workspaces: [{"id":"b9afb999-cf05-4cf0-b872-08d91a03ddc3","name":"Task Workspace","ownerId":"3be4a8c7-f919-4376-8bb9-e0dac393f92e","createdAt":"2025-04-17T01:42:47.292Z"}]
+Project creation response: 201 {"project":{"id":"869e99d6-095e-4235-bf0f-ef676028d56c","name":"Test Project","description":null,"workspaceId":"b9afb999-cf05-4cf0-b872-08d91a03ddc3","createdAt":"2025-04-17T01:42:47.339Z"}}
+Project created: {"id":"869e99d6-095e-4235-bf0f-ef676028d56c","name":"Test Project","description":null,"workspaceId":"b9afb999-cf05-4cf0-b872-08d91a03ddc3","createdAt":"2025-04-17T01:42:47.339Z"}
+Main task creation response: 201 {"task":{"id":"d454c950-354c-4f62-8320-157637c8f1d9","title":"Main Task","description":null,"status":"todo","priority":null,"dueDate":null,"assigneeId":"6ac805b1-9651-45a2-8a15-6b5a7b5c586d","projectId":"869e99d6-095e-4235-bf0f-ef676028d56c","parentTaskId":null,"createdAt":"2025-04-17T01:42:47.368Z","updatedAt":"2025-04-17T01:42:47.368Z","labels":[{"id":"37a50572-e593-4d58-8763-9e71fcba4022","name":"Urgent","color":"#f00","workspaceId":"b9afb999-cf05-4cf0-b872-08d91a03ddc3"}],"assignee":{"id":"6ac805b1-9651-45a2-8a15-6b5a7b5c586d","name":"Other Task User","avatarUrl":null},"subtasks":[],"parentTask":null}}
+Main task created: {"id":"d454c950-354c-4f62-8320-157637c8f1d9","title":"Main Task","description":null,"status":"todo","priority":null,"dueDate":null,"assigneeId":"6ac805b1-9651-45a2-8a15-6b5a7b5c586d","projectId":"869e99d6-095e-4235-bf0f-ef676028d56c","parentTaskId":null,"createdAt":"2025-04-17T01:42:47.368Z","updatedAt":"2025-04-17T01:42:47.368Z","labels":[{"id":"37a50572-e593-4d58-8763-9e71fcba4022","name":"Urgent","color":"#f00","workspaceId":"b9afb999-cf05-4cf0-b872-08d91a03ddc3"}],"assignee":{"id":"6ac805b1-9651-45a2-8a15-6b5a7b5c586d","name":"Other Task User","avatarUrl":null},"subtasks":[],"parentTask":null}
+Parent task before subtask: {"id":"d454c950-354c-4f62-8320-157637c8f1d9","title":"Main Task","description":null,"status":"todo","priority":null,"dueDate":null,"assigneeId":"6ac805b1-9651-45a2-8a15-6b5a7b5c586d","projectId":"869e99d6-095e-4235-bf0f-ef676028d56c","parentTaskId":null,"createdAt":"2025-04-17T01:42:47.368Z","updatedAt":"2025-04-17T01:42:47.368Z","labels":[{"id":"37a50572-e593-4d58-8763-9e71fcba4022","name":"Urgent","color":"#f00","workspaceId":"b9afb999-cf05-4cf0-b872-08d91a03ddc3"}],"assignee":{"id":"6ac805b1-9651-45a2-8a15-6b5a7b5c586d","name":"Other Task User","avatarUrl":null},"subtasks":[],"parentTask":null}
+Subtask response: 201 {"task":{"id":"cf32f864-ce06-40fb-a174-8df4c97e059a","title":"Subtask","description":null,"status":"todo","priority":null,"dueDate":null,"assigneeId":null,"projectId":"869e99d6-095e-4235-bf0f-ef676028d56c","parentTaskId":"d454c950-354c-4f62-8320-157637c8f1d9","createdAt":"2025-04-17T01:42:47.387Z","updatedAt":"2025-04-17T01:42:47.387Z","labels":[],"assignee":null,"subtasks":[],"parentTask":{"id":"d454c950-354c-4f62-8320-157637c8f1d9","title":"Main Task"}}}
