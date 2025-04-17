@@ -48,33 +48,22 @@ function AuthForm() {
 
   return (
     <div className="relative min-h-screen w-full bg-white text-black transition-colors duration-300 dark:bg-gray-900 dark:text-white flex flex-col">
-      {/* Header: Logo/Title left, Register button right */}
-      <div className="flex flex-1 flex-col items-center justify-center w-full px-10 py-8 relative">
-        <div className="flex  items-center w-full">
-          <img
-            src="/img/LogoSultan.png"
-            alt="TaskSultan Logo"
-            width={125}
-            height={125}
-            className="h-[125px] w-[125px] object-contain drop-shadow-lg my-8"
-            draggable="false"
-          />
-          <span
-            className="text-[20rem] md:text-[20.5rem] lg:text-[45rem] font-extrabold tracking-tight text-black dark:text-white leading-none font-sans select-none drop-shadow-xl mt-4"
-            style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif', fontWeight: 700, margin: '20px', fontSize: 35, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            Task Sultan
-          </span>
-        </div>
-        {tab === 'login' && (
-          <button
-            type="button"
-            className="absolute top-8 right-8 px-8 py-4 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white font-semibold text-lg md:text-xl shadow-lg shadow-purple-900/30 transition-all duration-200 border-0 focus:ring-2 focus:ring-purple-400 focus:outline-none"
-            onClick={() => setTab('register')}
-          >
-            Register
-          </button>
-        )}
+      {/* Centered Logo and Title */}
+      <div className="flex flex-col items-center justify-center w-full mb-8">
+        <img
+          src="/img/LogoSultan.png"
+          alt="TaskSultan Logo"
+          width={125}
+          height={125}
+          className="h-[125px] w-[125px] object-contain drop-shadow-lg my-4"
+          draggable="false"
+        />
+        <span
+          className="font-extrabold tracking-tight text-black dark:text-white leading-none font-sans select-none drop-shadow-xl mt-2 text-center"
+          style={{ fontFamily: 'Inter, ui-sans-serif, system-ui, sans-serif', fontWeight: 700, fontSize: 35 }}
+        >
+          Task Sultan
+        </span>
       </div>
       {/* Centered Auth Card */}
       <div className="flex flex-1 items-center justify-center">
@@ -83,9 +72,7 @@ function AuthForm() {
             <Tabs value={tab} onValueChange={v => setTab(v as 'login' | 'register')} className="w-full">
               <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-200 dark:bg-gray-800 rounded-lg p-1">
                 <TabsTrigger value="login" className="rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-gray-300">Sign In</TabsTrigger>
-                {tab !== 'login' && (
-                  <TabsTrigger value="register" className="rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-gray-300">Register</TabsTrigger>
-                )}
+                <TabsTrigger value="register" className="rounded-md data-[state=active]:bg-blue-600 data-[state=active]:text-white data-[state=inactive]:text-gray-700 dark:data-[state=inactive]:text-gray-300">Register</TabsTrigger>
               </TabsList>
               <TabsContent value="login">
                 <form onSubmit={loginForm.handleSubmit(handleLogin)} className="flex flex-col items-center justify-center space-y-6">

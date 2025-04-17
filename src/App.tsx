@@ -41,7 +41,18 @@ function Dashboard() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black dark:bg-gray-900 dark:text-white">
       <NavBar />
       <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-md mt-8">
-        <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
+        {/* Dashboard header with logo and title */}
+        <div className="flex items-center gap-3 mb-4">
+          <img
+            src="/img/LogoSultan.png"
+            alt="TaskSultan Logo"
+            width={50}
+            height={50}
+            className="h-[50px] w-[50px] object-contain drop-shadow"
+            draggable="false"
+          />
+          <h1 className="text-2xl font-bold">Task Sultan</h1>
+        </div>
         <p className="mb-4">Welcome, <span className="font-semibold">{user?.name}</span>!</p>
         <form className="flex gap-2 mb-4" onSubmit={handleCreateWorkspace}>
           <input
