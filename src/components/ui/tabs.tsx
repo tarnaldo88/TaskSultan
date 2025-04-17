@@ -8,27 +8,28 @@ interface TabsProps extends React.HTMLAttributes<HTMLDivElement> {
 
 interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   value: string
-  tabValue?: string
-  setTabValue?: (value: string) => void
   children: React.ReactNode
 }
 
 interface TabsContentProps extends React.HTMLAttributes<HTMLDivElement> {
   value: string
-  tabValue?: string
   children: React.ReactNode
 }
 
+// Context for tab state
+interface TabsContextType {
+  tabValue: string
+  setTabValue: (value: string) => void
+}
+const TabsContext = React.createContext<TabsContextType | undefined>(undefined)
+
 function Tabs({ value, onValueChange, className, children, ...props }: TabsProps) {
   return (
-    <div {...props} className={cn('w-full', className)}>
-      {React.Children.map(children, child => {
-        if (React.isValidElement(child) &&
-          (child.type === TabsTrigger || child.type === TabsContent))
-          return React.cloneElement(child, { tabValue: value, setTabValue: onValueChange })
-        return child
-      })}
-    </div>
+    <TabsContext.Provider value={{ tabValue: value, setTabValue: onValueChange }}>
+      <div {...props} className={cn('w-full', className)}>
+        {children}
+      </div>
+    </TabsContext.Provider>
   )
 }
 
@@ -36,27 +37,29 @@ function TabsList({ children, className, ...props }: React.HTMLAttributes<HTMLDi
   return <div {...props} className={cn('flex gap-2', className)}>{children}</div>
 }
 
-function TabsTrigger({ value, tabValue, setTabValue, children, className, ...props }: TabsTriggerProps) {
-  const isActive = tabValue === value
-  // Remove tabValue and setTabValue from props before spreading to button
-  const { tabValue: _tabValue, setTabValue: _setTabValue, ...rest } = props as any
+function TabsTrigger({ value, children, className, ...props }: TabsTriggerProps) {
+  const ctx = React.useContext(TabsContext)
+  if (!ctx) throw new Error('TabsTrigger must be used within Tabs')
+  const isActive = ctx.tabValue === value
   return (
     <button
       type="button"
-      {...rest}
+      {...props}
       className={cn('px-4 py-2 rounded', isActive ? 'bg-primary text-white' : 'bg-muted', className)}
-      onClick={() => setTabValue && setTabValue(value)}
+      onClick={() => ctx.setTabValue(value)}
     >
       {children}
     </button>
   )
 }
+TabsTrigger.displayName = 'TabsTrigger'
 
-function TabsContent({ value, tabValue, children, ...props }: TabsContentProps) {
-  if (tabValue !== value) return null
-  // Remove tabValue and setTabValue from props before spreading to div
-  const { tabValue: _tabValue, setTabValue: _setTabValue, ...rest } = props as any
-  return <div {...rest}>{children}</div>
+function TabsContent({ value, children, ...props }: TabsContentProps) {
+  const ctx = React.useContext(TabsContext)
+  if (!ctx) throw new Error('TabsContent must be used within Tabs')
+  if (ctx.tabValue !== value) return null
+  return <div {...props}>{children}</div>
 }
+TabsContent.displayName = 'TabsContent'
 
 export { Tabs, TabsList, TabsTrigger, TabsContent }
