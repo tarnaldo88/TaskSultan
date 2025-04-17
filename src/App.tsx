@@ -3,16 +3,84 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, Link } from 'react
 import { AuthForm } from './components/auth/AuthForm'
 import { useAuth } from './store/authContext'
 import { listProjects } from './services/project'
+import { createWorkspace } from './services/workspace'
 import type { Project } from './types/project'
+import type { Workspace } from './types/workspace'
 
 function Dashboard() {
-  const { user, logout } = useAuth()
+  const { user, token, logout, fetchMe } = useAuth()
+  const [workspaces, setWorkspaces] = React.useState<Workspace[]>(user?.workspaces || [])
+  const [activeWorkspaceId, setActiveWorkspaceId] = React.useState<string | null>(user?.workspaces?.[0]?.id || null)
+  const [creating, setCreating] = React.useState(false)
+  const [newWorkspace, setNewWorkspace] = React.useState('')
+  const [error, setError] = React.useState<string | null>(null)
+
+  React.useEffect(() => {
+    setWorkspaces(user?.workspaces || [])
+    if (user?.workspaces?.length && !activeWorkspaceId) setActiveWorkspaceId(user.workspaces[0].id)
+  }, [user])
+
+  async function handleCreateWorkspace(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    if (!newWorkspace.trim() || !token) return
+    setCreating(true)
+    try {
+      const ws = await createWorkspace({ name: newWorkspace.trim(), token })
+      await fetchMe()
+      setNewWorkspace('')
+      setActiveWorkspaceId(ws.id)
+    } catch (err: any) {
+      setError(err.message)
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  function handleWorkspaceSelect(e: React.ChangeEvent<HTMLSelectElement>) {
+    setActiveWorkspaceId(e.target.value)
+  }
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black dark:bg-gray-900 dark:text-white">
       <NavBar />
       <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-md mt-8">
         <h1 className="text-2xl font-bold mb-4">Dashboard</h1>
         <p className="mb-4">Welcome, <span className="font-semibold">{user?.name}</span>!</p>
+        <form className="flex gap-2 mb-4" onSubmit={handleCreateWorkspace}>
+          <input
+            type="text"
+            value={newWorkspace}
+            onChange={e => setNewWorkspace(e.target.value)}
+            placeholder="New workspace name"
+            className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+            disabled={creating}
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50"
+            disabled={creating || !newWorkspace.trim()}
+          >
+            {creating ? 'Creating...' : 'Create'}
+          </button>
+        </form>
+        {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+        <div className="mb-2 font-semibold">Your Workspaces:</div>
+        <select
+          className="mb-4 px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700 w-full"
+          value={activeWorkspaceId || ''}
+          onChange={handleWorkspaceSelect}
+          disabled={!workspaces.length}
+        >
+          {workspaces.map(ws => (
+            <option key={ws.id} value={ws.id}>{ws.name}</option>
+          ))}
+        </select>
+        <ul className="space-y-1 mb-4">
+          {workspaces.map(ws => (
+            <li key={ws.id} className="text-sm">{ws.name}</li>
+          ))}
+        </ul>
         <button className="px-4 py-2 rounded bg-primary text-white" onClick={logout}>Logout</button>
       </div>
     </div>
@@ -24,24 +92,40 @@ function Projects() {
   const [projects, setProjects] = React.useState<Project[]>([])
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
-
-  // For demo, assume workspaceId is user's first workspace or a static string
-  const workspaceId = user?.workspaces?.[0]?.id || 'demo-workspace-id'
+  const [activeWorkspaceId, setActiveWorkspaceId] = React.useState<string | null>(user?.workspaces?.[0]?.id || null)
 
   React.useEffect(() => {
-    if (!workspaceId || !token) return
+    setActiveWorkspaceId(user?.workspaces?.[0]?.id || null)
+  }, [user])
+
+  React.useEffect(() => {
+    if (!activeWorkspaceId || !token) return
     setLoading(true)
-    listProjects({ workspaceId, token })
+    listProjects({ workspaceId: activeWorkspaceId, token })
       .then(setProjects)
       .catch(e => setError(e.message))
       .finally(() => setLoading(false))
-  }, [workspaceId, token])
+  }, [activeWorkspaceId, token])
+
+  function handleWorkspaceSelect(e: React.ChangeEvent<HTMLSelectElement>) {
+    setActiveWorkspaceId(e.target.value)
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black dark:bg-gray-900 dark:text-white">
       <NavBar />
       <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-md mt-8">
         <h1 className="text-2xl font-bold mb-4">Projects</h1>
+        <select
+          className="mb-4 px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700 w-full"
+          value={activeWorkspaceId || ''}
+          onChange={handleWorkspaceSelect}
+          disabled={!user?.workspaces?.length}
+        >
+          {user?.workspaces?.map(ws => (
+            <option key={ws.id} value={ws.id}>{ws.name}</option>
+          ))}
+        </select>
         {loading && <div>Loading projects...</div>}
         {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
         <ul className="space-y-2">
