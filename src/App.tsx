@@ -10,7 +10,7 @@ import { WorkspaceProvider, useWorkspace } from './store/workspaceContext'
 
 function Dashboard() {
   const { user, token, logout, fetchMe } = useAuth()
-  const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace()
+  const { workspaces, activeWorkspaceId, setActiveWorkspaceId, reloadWorkspaces } = useWorkspace()
   const [creating, setCreating] = React.useState(false)
   const [newWorkspace, setNewWorkspace] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
@@ -18,16 +18,21 @@ function Dashboard() {
   async function handleCreateWorkspace(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
-    if (!newWorkspace.trim() || !token) return
+    if (!newWorkspace.trim() || !token) {
+      setError('Workspace name and authentication required.')
+      return
+    }
     setCreating(true)
     try {
       const ws = await createWorkspace({ name: newWorkspace.trim(), token })
+      await reloadWorkspaces()
       await fetchMe()
       setNewWorkspace('')
       setActiveWorkspaceId(ws.id)
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message || 'Failed to create workspace')
       console.error('Workspace creation error:', err)
+      alert(`Workspace creation error: ${err.message || err}`)
     } finally {
       setCreating(false)
     }
@@ -36,6 +41,9 @@ function Dashboard() {
   function handleWorkspaceSelect(e: React.ChangeEvent<HTMLSelectElement>) {
     setActiveWorkspaceId(e.target.value)
   }
+
+  // Debug: log workspaces on every render
+  console.log('Dashboard render workspaces:', workspaces)
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black dark:bg-gray-900 dark:text-white">
