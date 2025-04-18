@@ -3,7 +3,8 @@ import { prisma } from '../prisma/client'
 
 export async function listTasks(req: Request, res: Response) {
   const userId = (req as any).userId
-  const { projectId, labelId, assigneeId, parentTaskId } = req.query as Record<string, string>
+  const { projectId } = req.params
+  const { labelId, assigneeId, parentTaskId } = req.query as Record<string, string>
   // Only allow if user is a member of the workspace
   if (!projectId) return res.status(400).json({ error: 'Missing projectId' })
   const project = await prisma.project.findUnique({ where: { id: projectId } })

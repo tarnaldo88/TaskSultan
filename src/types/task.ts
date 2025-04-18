@@ -7,6 +7,8 @@ export interface Task {
   dueDate?: string
   assigneeId?: string
   projectId: string
+  parentTaskId?: string
+  subtasks?: Task[]
   createdAt: string
   updatedAt: string
 }

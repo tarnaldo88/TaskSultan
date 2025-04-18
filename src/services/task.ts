@@ -19,16 +19,17 @@ export interface CreateTaskParams {
   title: string
   description?: string
   token: string
+  parentTaskId?: string
 }
 
-export async function createTask({ projectId, title, description, token }: CreateTaskParams): Promise<Task> {
+export async function createTask({ projectId, title, description, token, parentTaskId }: CreateTaskParams): Promise<Task> {
   const res = await fetch(`http://localhost:4000/api/projects/${projectId}/tasks`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify({ title, description })
+    body: JSON.stringify({ title, description, parentTaskId })
   })
   if (!res.ok) throw new Error((await res.json()).error || 'Failed to create task')
   const data = await res.json()

@@ -7,7 +7,6 @@ import type { Task } from '../types/task'
 
 function ProjectDetail() {
   const { projectId } = useParams()
-  if (!projectId) return <div className="p-8 text-red-500">Invalid project URL: missing projectId.</div>
   const { token } = useAuth()
   const [project, setProject] = React.useState<any>(null)
   const [loading, setLoading] = React.useState(true)
@@ -18,6 +17,11 @@ function ProjectDetail() {
   const [newTaskTitle, setNewTaskTitle] = React.useState('')
   const [newTaskDesc, setNewTaskDesc] = React.useState('')
   const [creatingTask, setCreatingTask] = React.useState(false)
+  const [subtaskTitle, setSubtaskTitle] = React.useState('')
+  const [subtaskDesc, setSubtaskDesc] = React.useState('')
+  const [subtaskParentId, setSubtaskParentId] = React.useState<string | null>(null)
+  const [creatingSubtask, setCreatingSubtask] = React.useState(false)
+  const [subtaskError, setSubtaskError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     if (!projectId || !token) return
@@ -39,6 +43,8 @@ function ProjectDetail() {
       .finally(() => setTaskLoading(false))
   }, [projectId, token])
 
+  if (!projectId) return <div className="p-8 text-red-500">Invalid project URL: missing projectId.</div>
+
   async function handleCreateTask(e: React.FormEvent) {
     e.preventDefault()
     setTaskError(null)
@@ -57,6 +63,40 @@ function ProjectDetail() {
     } finally {
       setCreatingTask(false)
     }
+  }
+
+  async function handleCreateSubtask(parentTaskId: string) {
+    setSubtaskError(null)
+    if (!projectId || !token || !subtaskTitle.trim()) {
+      setSubtaskError('Subtask title and authentication required.')
+      return
+    }
+    setCreatingSubtask(true)
+    try {
+      const subtask = await createTask({ projectId, title: subtaskTitle.trim(), description: subtaskDesc.trim(), parentTaskId, token })
+      setTasks(ts => ts.map(t => t.id === parentTaskId ? { ...t, subtasks: [...(t.subtasks || []), subtask] } : t))
+      setSubtaskTitle('')
+      setSubtaskDesc('')
+      setSubtaskParentId(null)
+    } catch (err: any) {
+      setSubtaskError(err.message || 'Failed to create subtask')
+    } finally {
+      setCreatingSubtask(false)
+    }
+  }
+
+  function SubtaskTree({ subtasks, token, onUpdate }: { subtasks?: Task[]; token: string; onUpdate: (t: Task) => void }) {
+    if (!subtasks || subtasks.length === 0) return null
+    return (
+      <ul className="ml-6 border-l border-gray-300 dark:border-gray-700 pl-4 mt-1">
+        {subtasks.map(subtask => (
+          <li key={subtask.id} className="mb-1">
+            <TaskItem task={subtask} token={token} onUpdate={onUpdate} />
+            <SubtaskTree subtasks={subtask.subtasks} token={token} onUpdate={onUpdate} />
+          </li>
+        ))}
+      </ul>
+    )
   }
 
   function TaskItem({ task, token, onUpdate }: { task: Task; token: string; onUpdate: (t: Task) => void }) {
@@ -86,6 +126,8 @@ function ProjectDetail() {
         setSaving(false)
       }
     }
+
+    const isAddingSubtask = subtaskParentId === task.id
 
     if (editing) {
       return (
@@ -126,33 +168,92 @@ function ProjectDetail() {
     }
 
     return (
-      <li className="text-sm border-b border-gray-200 dark:border-gray-700 py-2 flex items-center gap-2 group">
-        <span className="font-semibold">{task.title}</span>
-        {task.description && <span className="ml-2 text-gray-400">{task.description}</span>}
-        <span className="ml-4 text-xs text-gray-400">{task.status}</span>
-        <select
-          className="ml-4 px-2 py-1 rounded border text-xs dark:bg-gray-900 dark:text-white dark:border-gray-700"
-          value={task.status}
-          onChange={async e => {
-            try {
-              const updated = await updateTask({ id: task.id, token, status: e.target.value })
-              onUpdate(updated)
-            } catch (err: any) {
-              setError(err.message || 'Failed to update status')
-            }
-          }}
-        >
-          <option value="todo">To Do</option>
-          <option value="in-progress">In Progress</option>
-          <option value="done">Done</option>
-        </select>
-        <button
-          type="button"
-          className="ml-2 px-2 py-1 rounded bg-yellow-500 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition"
-          onClick={startEdit}
-        >
-          Edit
-        </button>
+      <li className="text-sm border-b border-gray-200 dark:border-gray-700 py-2 flex flex-col gap-1">
+        <div className="flex items-center gap-2">
+          <span className="font-semibold">{task.title}</span>
+          {task.description && <span className="ml-2 text-gray-400">{task.description}</span>}
+          <span className="ml-4 text-xs text-gray-400">{task.status}</span>
+          <select
+            className="ml-4 px-2 py-1 rounded border text-xs dark:bg-gray-900 dark:text-white dark:border-gray-700"
+            value={task.status}
+            onChange={async e => {
+              try {
+                const updated = await updateTask({ id: task.id, token, status: e.target.value })
+                onUpdate(updated)
+              } catch (err: any) {
+                setError(err.message || 'Failed to update status')
+              }
+            }}
+          >
+            <option value="todo">To Do</option>
+            <option value="in-progress">In Progress</option>
+            <option value="done">Done</option>
+          </select>
+          <button
+            type="button"
+            className="ml-2 px-2 py-1 rounded bg-yellow-500 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition"
+            onClick={startEdit}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            className="ml-2 px-2 py-1 rounded bg-green-600 text-white text-xs font-semibold"
+            onClick={() => setSubtaskParentId(task.id)}
+          >
+            + Subtask
+          </button>
+        </div>
+        {isAddingSubtask && (
+          <form
+            className="flex flex-col gap-1 mt-2 ml-6"
+            onSubmit={e => {
+              e.preventDefault()
+              handleCreateSubtask(task.id)
+            }}
+            autoComplete="off"
+          >
+            <input
+              type="text"
+              value={subtaskTitle}
+              onChange={e => setSubtaskTitle(e.target.value)}
+              placeholder="Subtask title"
+              className="px-2 py-1 rounded border text-xs dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              disabled={creatingSubtask}
+              autoFocus={subtaskTitle === '' && subtaskDesc === ''}
+            />
+            <input
+              type="text"
+              value={subtaskDesc}
+              onChange={e => setSubtaskDesc(e.target.value)}
+              placeholder="Description (optional)"
+              className="px-2 py-1 rounded border text-xs dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              disabled={creatingSubtask}
+            />
+            <div className="flex gap-2 mt-1">
+              <button
+                type="submit"
+                className="px-2 py-1 rounded bg-blue-600 text-white text-xs font-semibold disabled:opacity-50"
+                disabled={creatingSubtask || !subtaskTitle.trim()}
+              >
+                {creatingSubtask ? 'Creating...' : 'Add Subtask'}
+              </button>
+              <button
+                type="button"
+                className="px-2 py-1 rounded bg-gray-400 text-white text-xs font-semibold"
+                onClick={() => {
+                  setSubtaskParentId(null)
+                  setSubtaskTitle('')
+                  setSubtaskDesc('')
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+            {subtaskError && <span className="text-xs text-red-500 mt-1">{subtaskError}</span>}
+          </form>
+        )}
+        <SubtaskTree subtasks={task.subtasks} token={token} onUpdate={onUpdate} />
         {error && <span className="text-xs text-red-500 ml-2">{error}</span>}
       </li>
     )
