@@ -1,12 +1,26 @@
 import type { Request, Response } from 'express'
 import { prisma } from '../prisma/client'
+import type { CommentWithUser } from '../types'
 
 // Get all comments for a task
 export async function listComments(req: Request, res: Response) {
   const { taskId } = req.params
-  const comments = await prisma.comment.findMany({
+  const comments: CommentWithUser[] = await prisma.comment.findMany({
     where: { taskId },
-    include: { user: { select: { id: true, name: true, avatarUrl: true } } },
+    select: {
+      id: true,
+      taskId: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          avatarUrl: true
+        }
+      }
+    },
     orderBy: { createdAt: 'asc' }
   })
   res.json({ comments })
@@ -20,8 +34,22 @@ export async function createComment(req: Request, res: Response) {
   if (!content || typeof content !== 'string' || !content.trim()) {
     return res.status(400).json({ error: 'Content is required' })
   }
-  const comment = await prisma.comment.create({
-    data: { content: content.trim(), userId, taskId }
+  const comment: CommentWithUser = await prisma.comment.create({
+    data: { content: content.trim(), userId, taskId },
+    select: {
+      id: true,
+      taskId: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          avatarUrl: true
+        }
+      }
+    }
   })
   res.status(201).json({ comment })
 }
@@ -34,7 +62,24 @@ export async function updateComment(req: Request, res: Response) {
   const comment = await prisma.comment.findUnique({ where: { id } })
   if (!comment) return res.status(404).json({ error: 'Comment not found' })
   if (comment.userId !== userId) return res.status(403).json({ error: 'Not authorized' })
-  const updated = await prisma.comment.update({ where: { id }, data: { content } })
+  const updated: CommentWithUser = await prisma.comment.update({
+    where: { id },
+    data: { content },
+    select: {
+      id: true,
+      taskId: true,
+      content: true,
+      createdAt: true,
+      updatedAt: true,
+      user: {
+        select: {
+          id: true,
+          name: true,
+          avatarUrl: true
+        }
+      }
+    }
+  })
   res.json({ comment: updated })
 }
 
