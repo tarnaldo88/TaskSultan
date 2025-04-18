@@ -17,11 +17,7 @@ function ProjectDetail() {
   const [newTaskTitle, setNewTaskTitle] = React.useState('')
   const [newTaskDesc, setNewTaskDesc] = React.useState('')
   const [creatingTask, setCreatingTask] = React.useState(false)
-  const [subtaskTitle, setSubtaskTitle] = React.useState('')
-  const [subtaskDesc, setSubtaskDesc] = React.useState('')
   const [subtaskParentId, setSubtaskParentId] = React.useState<string | null>(null)
-  const [creatingSubtask, setCreatingSubtask] = React.useState(false)
-  const [subtaskError, setSubtaskError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     if (!projectId || !token) return
@@ -65,26 +61,6 @@ function ProjectDetail() {
     }
   }
 
-  async function handleCreateSubtask(parentTaskId: string) {
-    setSubtaskError(null)
-    if (!projectId || !token || !subtaskTitle.trim()) {
-      setSubtaskError('Subtask title and authentication required.')
-      return
-    }
-    setCreatingSubtask(true)
-    try {
-      const subtask = await createTask({ projectId, title: subtaskTitle.trim(), description: subtaskDesc.trim(), parentTaskId, token })
-      setTasks(ts => ts.map(t => t.id === parentTaskId ? { ...t, subtasks: [...(t.subtasks || []), subtask] } : t))
-      setSubtaskTitle('')
-      setSubtaskDesc('')
-      setSubtaskParentId(null)
-    } catch (err: any) {
-      setSubtaskError(err.message || 'Failed to create subtask')
-    } finally {
-      setCreatingSubtask(false)
-    }
-  }
-
   function SubtaskTree({ subtasks, token, onUpdate }: { subtasks?: Task[]; token: string; onUpdate: (t: Task) => void }) {
     if (!subtasks || subtasks.length === 0) return null
     return (
@@ -105,6 +81,30 @@ function ProjectDetail() {
     const [description, setDescription] = React.useState(task.description || '')
     const [saving, setSaving] = React.useState(false)
     const [error, setError] = React.useState<string | null>(null)
+    const [subtaskTitle, setSubtaskTitle] = React.useState('')
+    const [subtaskDesc, setSubtaskDesc] = React.useState('')
+    const [creatingSubtask, setCreatingSubtask] = React.useState(false)
+    const [subtaskError, setSubtaskError] = React.useState<string | null>(null)
+
+    async function handleCreateSubtask() {
+      setSubtaskError(null)
+      if (!projectId || !token || !subtaskTitle.trim()) {
+        setSubtaskError('Subtask title and authentication required.')
+        return
+      }
+      setCreatingSubtask(true)
+      try {
+        const subtask = await createTask({ projectId, title: subtaskTitle.trim(), description: subtaskDesc.trim(), parentTaskId: task.id, token })
+        onUpdate({ ...task, subtasks: [...(task.subtasks || []), subtask] })
+        setSubtaskTitle('')
+        setSubtaskDesc('')
+        setSubtaskParentId(null)
+      } catch (err: any) {
+        setSubtaskError(err.message || 'Failed to create subtask')
+      } finally {
+        setCreatingSubtask(false)
+      }
+    }
 
     function startEdit() {
       setEditing(true)
@@ -125,6 +125,13 @@ function ProjectDetail() {
       } finally {
         setSaving(false)
       }
+    }
+
+    function handleSubtaskUpdate(updatedSubtask: Task) {
+      onUpdate({
+        ...task,
+        subtasks: (task.subtasks || []).map(st => st.id === updatedSubtask.id ? updatedSubtask : st)
+      })
     }
 
     const isAddingSubtask = subtaskParentId === task.id
@@ -209,7 +216,7 @@ function ProjectDetail() {
             className="flex flex-col gap-1 mt-2 ml-6"
             onSubmit={e => {
               e.preventDefault()
-              handleCreateSubtask(task.id)
+              handleCreateSubtask()
             }}
             autoComplete="off"
           >
@@ -220,7 +227,6 @@ function ProjectDetail() {
               placeholder="Subtask title"
               className="px-2 py-1 rounded border text-xs dark:bg-gray-900 dark:text-white dark:border-gray-700"
               disabled={creatingSubtask}
-              autoFocus={subtaskTitle === '' && subtaskDesc === ''}
             />
             <input
               type="text"
@@ -253,7 +259,7 @@ function ProjectDetail() {
             {subtaskError && <span className="text-xs text-red-500 mt-1">{subtaskError}</span>}
           </form>
         )}
-        <SubtaskTree subtasks={task.subtasks} token={token} onUpdate={onUpdate} />
+        <SubtaskTree subtasks={task.subtasks} token={token} onUpdate={handleSubtaskUpdate} />
         {error && <span className="text-xs text-red-500 ml-2">{error}</span>}
       </li>
     )
@@ -264,71 +270,71 @@ function ProjectDetail() {
   if (!project) return <div className="p-8">Project not found.</div>
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black dark:bg-gray-900 dark:text-white">
-      <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-xl mt-8">
-        <h1 className="text-2xl font-bold mb-2">{project.name ?? ''}</h1>
-        {project.description && <div className="mb-4 text-gray-400">{project.description}</div>}
-        <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-2">Tasks</h2>
-          <form className="flex flex-col gap-2 mb-4" onSubmit={handleCreateTask}>
-            <input
-              type="text"
-              value={newTaskTitle}
-              onChange={e => setNewTaskTitle(e.target.value)}
-              placeholder="Task title"
-              className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
-              disabled={creatingTask}
-            />
-            <input
-              type="text"
-              value={newTaskDesc}
-              onChange={e => setNewTaskDesc(e.target.value)}
-              placeholder="Description (optional)"
-              className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
-              disabled={creatingTask}
-            />
-            <button
-              type="submit"
-              className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50"
-              disabled={creatingTask || !newTaskTitle.trim()}
-            >
-              {creatingTask ? 'Creating...' : 'Add Task'}
-            </button>
-          </form>
-          {taskError && <div className="text-red-500 text-sm mb-2">{taskError}</div>}
-          {taskLoading ? (
-            <div className="text-gray-500">Loading tasks...</div>
-          ) : (
-            <>
-              <ul className="space-y-1">
-                {tasks.filter(task => task.status !== 'done').length === 0 && (
-                  <li className="text-sm text-gray-500">No tasks found.</li>
-                )}
-                {tasks.filter(task => task.status !== 'done').map(task => (
-                  <TaskItem
-                    key={task.id}
-                    task={{
-                      ...task,
-                      status: task.status ?? 'todo',
-                      description: task.description ?? ''
-                    }}
-                    token={token ?? ''}
-                    onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated.id ? updated : t))}
-                  />
-                ))}
-              </ul>
-              <div className="mt-8">
-                <h3 className="text-lg font-semibold mb-2 text-green-600">Done</h3>
+    <div className="min-h-screen bg-white text-black dark:bg-gray-900 dark:text-white">
+      <nav className="w-full flex items-center justify-between px-8 py-4 bg-card shadow">
+        <div className="flex items-center gap-4">
+          <img
+            src="/img/LogoSultan.png"
+            alt="TaskSultan Logo"
+            width={40}
+            height={40}
+            className="h-[40px] w-[40px] object-contain drop-shadow"
+            draggable="false"
+          />
+          <a href="/dashboard" className="font-bold text-lg text-primary">TaskSultan</a>
+        </div>
+        <div className="flex gap-4 items-center">
+          <a href="/dashboard" className="text-primary">Dashboard</a>
+          <a href="/projects" className="text-primary">Projects</a>
+          <a href="/profile" className="text-primary">Profile</a>
+        </div>
+      </nav>
+      <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full">
+          <h1 className="text-2xl font-bold mb-2">{project.name ?? ''}</h1>
+          {project.description && <div className="mb-4 text-gray-400">{project.description}</div>}
+          <div className="mt-8">
+            <h2 className="text-xl font-semibold mb-2">Tasks</h2>
+            <form className="flex flex-col gap-2 mb-4" onSubmit={handleCreateTask}>
+              <input
+                type="text"
+                value={newTaskTitle}
+                onChange={e => setNewTaskTitle(e.target.value)}
+                placeholder="Task title"
+                className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+                disabled={creatingTask}
+              />
+              <input
+                type="text"
+                value={newTaskDesc}
+                onChange={e => setNewTaskDesc(e.target.value)}
+                placeholder="Description (optional)"
+                className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+                disabled={creatingTask}
+              />
+              <button
+                type="submit"
+                className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
+                disabled={creatingTask || !newTaskTitle.trim()}
+              >
+                {creatingTask ? 'Creating...' : 'Add Task'}
+              </button>
+            </form>
+            {taskError && <div className="text-red-500 text-sm mb-2">{taskError}</div>}
+            {taskLoading ? (
+              <div className="text-gray-500">Loading tasks...</div>
+            ) : (
+              <>
                 <ul className="space-y-1">
-                  {tasks.filter(task => task.status === 'done').length === 0 && (
-                    <li className="text-sm text-gray-500">No done tasks.</li>
+                  {tasks.filter(task => task.status !== 'done').length === 0 && (
+                    <li className="text-sm text-gray-500">No tasks found.</li>
                   )}
-                  {tasks.filter(task => task.status === 'done').map(task => (
+                  {tasks.filter(task => task.status !== 'done').map(task => (
                     <TaskItem
                       key={task.id}
                       task={{
                         ...task,
-                        status: task.status ?? 'done',
+                        status: task.status ?? 'todo',
                         description: task.description ?? ''
                       }}
                       token={token ?? ''}
@@ -336,9 +342,29 @@ function ProjectDetail() {
                     />
                   ))}
                 </ul>
-              </div>
-            </>
-          )}
+                <div className="mt-8">
+                  <h3 className="text-lg font-semibold mb-2 text-green-600">Done</h3>
+                  <ul className="space-y-1">
+                    {tasks.filter(task => task.status === 'done').length === 0 && (
+                      <li className="text-sm text-gray-500">No done tasks.</li>
+                    )}
+                    {tasks.filter(task => task.status === 'done').map(task => (
+                      <TaskItem
+                        key={task.id}
+                        task={{
+                          ...task,
+                          status: task.status ?? 'done',
+                          description: task.description ?? ''
+                        }}
+                        token={token ?? ''}
+                        onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated.id ? updated : t))}
+                      />
+                    ))}
+                  </ul>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

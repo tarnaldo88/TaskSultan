@@ -74,7 +74,7 @@ function Dashboard() {
           />
           <button
             type="submit"
-            className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50"
+            className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
             disabled={creating || !newWorkspace.trim()}
           >
             {creating ? 'Creating...' : 'Create'}
@@ -176,7 +176,7 @@ function Projects() {
           />
           <button
             type="submit"
-            className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50"
+            className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
             disabled={creating || !newProjectName.trim() || !activeWorkspaceId}
           >
             {creating ? 'Creating...' : 'Create Project'}
