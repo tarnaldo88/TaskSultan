@@ -16,6 +16,12 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   const [workspaces, setWorkspaces] = useState<Workspace[]>(user?.workspaces || [])
   const [activeWorkspaceId, setActiveWorkspaceId] = useState<string | null>(user?.workspaces?.[0]?.id || null)
 
+  // Always fetch workspaces on mount if token is present
+  useEffect(() => {
+    if (token) reloadWorkspaces()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token])
+
   // Only set initial workspaces from user once, on mount
   useEffect(() => {
     if (workspaces.length === 0 && user?.workspaces?.length) {

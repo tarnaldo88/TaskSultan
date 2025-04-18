@@ -5,6 +5,7 @@ export async function listTasks(req: Request, res: Response) {
   const userId = (req as any).userId
   const { projectId, labelId, assigneeId, parentTaskId } = req.query as Record<string, string>
   // Only allow if user is a member of the workspace
+  if (!projectId) return res.status(400).json({ error: 'Missing projectId' })
   const project = await prisma.project.findUnique({ where: { id: projectId } })
   if (!project) return res.status(404).json({ error: 'Project not found' })
   const isMember = await prisma.workspaceMember.findFirst({ where: { workspaceId: project.workspaceId, userId } })
@@ -31,6 +32,7 @@ export async function createTask(req: Request, res: Response) {
   const { title, description, status, priority, dueDate, assigneeId, parentTaskId, labels } = req.body
   if (!title) return res.status(400).json({ error: 'Task title required' })
   // Only allow if user is a member of the workspace
+  if (!projectId) return res.status(400).json({ error: 'Missing projectId' })
   const project = await prisma.project.findUnique({ where: { id: projectId } })
   if (!project) return res.status(404).json({ error: 'Project not found' })
   const isMember = await prisma.workspaceMember.findFirst({ where: { workspaceId: project.workspaceId, userId } })
@@ -88,6 +90,7 @@ export async function getTask(req: Request, res: Response) {
   })
   if (!task) return res.status(404).json({ error: 'Task not found' })
   // Only allow if user is a member of the workspace
+  if (!task.projectId) return res.status(400).json({ error: 'Missing projectId' })
   const project = await prisma.project.findUnique({ where: { id: task.projectId } })
   if (!project) return res.status(404).json({ error: 'Project not found' })
   const isMember = await prisma.workspaceMember.findFirst({ where: { workspaceId: project.workspaceId, userId } })
@@ -102,6 +105,7 @@ export async function updateTask(req: Request, res: Response) {
   const task = await prisma.task.findUnique({ where: { id } })
   if (!task) return res.status(404).json({ error: 'Task not found' })
   // Only allow if user is a member of the workspace
+  if (!task.projectId) return res.status(400).json({ error: 'Missing projectId' })
   const project = await prisma.project.findUnique({ where: { id: task.projectId } })
   if (!project) return res.status(404).json({ error: 'Project not found' })
   const isMember = await prisma.workspaceMember.findFirst({ where: { workspaceId: project.workspaceId, userId } })
@@ -151,6 +155,7 @@ export async function deleteTask(req: Request, res: Response) {
   const task = await prisma.task.findUnique({ where: { id } })
   if (!task) return res.status(404).json({ error: 'Task not found' })
   // Only allow if user is a member of the workspace
+  if (!task.projectId) return res.status(400).json({ error: 'Missing projectId' })
   const project = await prisma.project.findUnique({ where: { id: task.projectId } })
   if (!project) return res.status(404).json({ error: 'Project not found' })
   const isMember = await prisma.workspaceMember.findFirst({ where: { workspaceId: project.workspaceId, userId } })

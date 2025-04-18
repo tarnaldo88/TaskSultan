@@ -1,0 +1,222 @@
+import React from 'react'
+import { useParams } from 'react-router-dom'
+import { useAuth } from '../store/authContext'
+import { getProject } from '../services/project'
+import { listTasks, createTask, updateTask } from '../services/task'
+import type { Task } from '../types/task'
+
+function ProjectDetail() {
+  const { projectId } = useParams()
+  const { token } = useAuth()
+  const [project, setProject] = React.useState<any>(null)
+  const [loading, setLoading] = React.useState(true)
+  const [error, setError] = React.useState<string | null>(null)
+  const [tasks, setTasks] = React.useState<Task[]>([])
+  const [taskLoading, setTaskLoading] = React.useState(true)
+  const [taskError, setTaskError] = React.useState<string | null>(null)
+  const [newTaskTitle, setNewTaskTitle] = React.useState('')
+  const [newTaskDesc, setNewTaskDesc] = React.useState('')
+  const [creatingTask, setCreatingTask] = React.useState(false)
+
+  React.useEffect(() => {
+    if (!projectId || !token) return
+    setLoading(true)
+    setError(null)
+    getProject({ projectId, token })
+      .then(setProject)
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false))
+  }, [projectId, token])
+
+  React.useEffect(() => {
+    if (!projectId || !token) return
+    setTaskLoading(true)
+    setTaskError(null)
+    listTasks({ projectId, token })
+      .then(setTasks)
+      .catch(e => setTaskError(e.message))
+      .finally(() => setTaskLoading(false))
+  }, [projectId, token])
+
+  async function handleCreateTask(e: React.FormEvent) {
+    e.preventDefault()
+    setTaskError(null)
+    if (!projectId || !token || !newTaskTitle.trim()) {
+      setTaskError('Task title and authentication required.')
+      return
+    }
+    setCreatingTask(true)
+    try {
+      const task = await createTask({ projectId, title: newTaskTitle.trim(), description: newTaskDesc.trim(), token })
+      setTasks(t => [...t, task])
+      setNewTaskTitle('')
+      setNewTaskDesc('')
+    } catch (err: any) {
+      setTaskError(err.message || 'Failed to create task')
+    } finally {
+      setCreatingTask(false)
+    }
+  }
+
+  function TaskItem({ task, token, onUpdate }: { task: Task; token: string; onUpdate: (t: Task) => void }) {
+    const [editing, setEditing] = React.useState(false)
+    const [title, setTitle] = React.useState(task.title)
+    const [description, setDescription] = React.useState(task.description || '')
+    const [saving, setSaving] = React.useState(false)
+    const [error, setError] = React.useState<string | null>(null)
+
+    function startEdit() {
+      setEditing(true)
+      setTitle(task.title)
+      setDescription(task.description || '')
+      setError(null)
+    }
+
+    async function saveEdit() {
+      setSaving(true)
+      setError(null)
+      try {
+        const updated = await updateTask({ id: task.id, token, title: title.trim(), description: description.trim() })
+        onUpdate(updated)
+        setEditing(false)
+      } catch (err: any) {
+        setError(err.message || 'Failed to update task')
+      } finally {
+        setSaving(false)
+      }
+    }
+
+    if (editing) {
+      return (
+        <li className="text-sm border-b border-gray-200 dark:border-gray-700 py-2 flex items-center gap-2">
+          <input
+            type="text"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            className="px-2 py-1 rounded border text-sm dark:bg-gray-900 dark:text-white dark:border-gray-700 w-32"
+            disabled={saving}
+          />
+          <input
+            type="text"
+            value={description}
+            onChange={e => setDescription(e.target.value)}
+            className="px-2 py-1 rounded border text-sm dark:bg-gray-900 dark:text-white dark:border-gray-700 w-48"
+            disabled={saving}
+          />
+          <button
+            type="button"
+            className="px-2 py-1 rounded bg-green-600 text-white text-xs font-semibold disabled:opacity-50"
+            disabled={saving || !title.trim()}
+            onClick={saveEdit}
+          >
+            Save
+          </button>
+          <button
+            type="button"
+            className="px-2 py-1 rounded bg-gray-300 text-gray-800 text-xs font-semibold ml-1"
+            disabled={saving}
+            onClick={() => setEditing(false)}
+          >
+            Cancel
+          </button>
+          {error && <span className="text-xs text-red-500 ml-2">{error}</span>}
+        </li>
+      )
+    }
+
+    return (
+      <li className="text-sm border-b border-gray-200 dark:border-gray-700 py-2 flex items-center gap-2 group">
+        <span className="font-semibold">{task.title}</span>
+        {task.description && <span className="ml-2 text-gray-400">{task.description}</span>}
+        <span className="ml-4 text-xs text-gray-400">{task.status}</span>
+        <select
+          className="ml-4 px-2 py-1 rounded border text-xs dark:bg-gray-900 dark:text-white dark:border-gray-700"
+          value={task.status}
+          onChange={async e => {
+            try {
+              const updated = await updateTask({ id: task.id, token, status: e.target.value })
+              onUpdate(updated)
+            } catch (err: any) {
+              setError(err.message || 'Failed to update status')
+            }
+          }}
+        >
+          <option value="todo">To Do</option>
+          <option value="in-progress">In Progress</option>
+          <option value="done">Done</option>
+        </select>
+        <button
+          type="button"
+          className="ml-2 px-2 py-1 rounded bg-yellow-500 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition"
+          onClick={startEdit}
+        >
+          Edit
+        </button>
+        {error && <span className="text-xs text-red-500 ml-2">{error}</span>}
+      </li>
+    )
+  }
+
+  if (loading) return <div className="p-8">Loading project...</div>
+  if (error) return <div className="text-red-500 p-8">{error}</div>
+  if (!project) return <div className="p-8">Project not found.</div>
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black dark:bg-gray-900 dark:text-white">
+      <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-xl mt-8">
+        <h1 className="text-2xl font-bold mb-2">{project.name ?? ''}</h1>
+        {project.description && <div className="mb-4 text-gray-400">{project.description}</div>}
+        <div className="mt-8">
+          <h2 className="text-xl font-semibold mb-2">Tasks</h2>
+          <form className="flex flex-col gap-2 mb-4" onSubmit={handleCreateTask}>
+            <input
+              type="text"
+              value={newTaskTitle}
+              onChange={e => setNewTaskTitle(e.target.value)}
+              placeholder="Task title"
+              className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              disabled={creatingTask}
+            />
+            <input
+              type="text"
+              value={newTaskDesc}
+              onChange={e => setNewTaskDesc(e.target.value)}
+              placeholder="Description (optional)"
+              className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              disabled={creatingTask}
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50"
+              disabled={creatingTask || !newTaskTitle.trim()}
+            >
+              {creatingTask ? 'Creating...' : 'Add Task'}
+            </button>
+          </form>
+          {taskError && <div className="text-red-500 text-sm mb-2">{taskError}</div>}
+          {taskLoading ? (
+            <div className="text-gray-500">Loading tasks...</div>
+          ) : (
+            <ul className="space-y-1">
+              {tasks.length === 0 && <li className="text-sm text-gray-500">No tasks found.</li>}
+              {tasks.map(task => (
+                <TaskItem
+                  key={task.id}
+                  task={{
+                    ...task,
+                    status: task.status ?? 'todo',
+                    description: task.description ?? ''
+                  }}
+                  token={token ?? ''}
+                  onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated.id ? updated : t))}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export { ProjectDetail }

@@ -1,8 +1,9 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom'
 import { AuthForm } from './components/auth/AuthForm'
+import { ProjectDetail } from './components/ProjectDetail'
 import { useAuth } from './store/authContext'
-import { listProjects, createProject } from './services/project'
+import { listProjects, createProject, getProject } from './services/project'
 import { createWorkspace } from './services/workspace'
 import type { Project } from './types/project'
 import type { Workspace } from './types/workspace'
@@ -190,7 +191,12 @@ function Projects() {
             {projects.length === 0 && <li className="text-sm text-gray-500">No projects found.</li>}
             {projects.map(prj => (
               <li key={prj.id} className="text-sm">
-                <span className="font-semibold">{prj.name}</span>
+                <Link
+                  to={`/projects/${prj.id}`}
+                  className="font-semibold text-primary hover:underline"
+                >
+                  {prj.name}
+                </Link>
                 {prj.description && <span className="ml-2 text-gray-400">{prj.description}</span>}
               </li>
             ))}
@@ -317,6 +323,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Projects />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/projects/:projectId"
+              element={
+                <ProtectedRoute>
+                  <ProjectDetail />
                 </ProtectedRoute>
               }
             />

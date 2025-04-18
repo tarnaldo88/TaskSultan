@@ -34,3 +34,12 @@ export async function createProject({ workspaceId, name, description, token }: C
   const data = await res.json()
   return data.project
 }
+
+export async function getProject({ projectId, token }: { projectId: string; token: string }): Promise<Project> {
+  const res = await fetch(`http://localhost:4000/api/projects/${projectId}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to fetch project')
+  const data = await res.json()
+  return data.project
+}
