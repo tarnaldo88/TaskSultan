@@ -9,6 +9,6 @@ export interface CommentWithUser {
   user: {
     id: string
     name: string
-    avatarUrl: string
+    avatarUrl: string | null
   }
 }
