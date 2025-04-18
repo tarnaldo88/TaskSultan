@@ -7,6 +7,7 @@ import type { Task } from '../types/task'
 
 function ProjectDetail() {
   const { projectId } = useParams()
+  if (!projectId) return <div className="p-8 text-red-500">Invalid project URL: missing projectId.</div>
   const { token } = useAuth()
   const [project, setProject] = React.useState<any>(null)
   const [loading, setLoading] = React.useState(true)
@@ -197,21 +198,45 @@ function ProjectDetail() {
           {taskLoading ? (
             <div className="text-gray-500">Loading tasks...</div>
           ) : (
-            <ul className="space-y-1">
-              {tasks.length === 0 && <li className="text-sm text-gray-500">No tasks found.</li>}
-              {tasks.map(task => (
-                <TaskItem
-                  key={task.id}
-                  task={{
-                    ...task,
-                    status: task.status ?? 'todo',
-                    description: task.description ?? ''
-                  }}
-                  token={token ?? ''}
-                  onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated.id ? updated : t))}
-                />
-              ))}
-            </ul>
+            <>
+              <ul className="space-y-1">
+                {tasks.filter(task => task.status !== 'done').length === 0 && (
+                  <li className="text-sm text-gray-500">No tasks found.</li>
+                )}
+                {tasks.filter(task => task.status !== 'done').map(task => (
+                  <TaskItem
+                    key={task.id}
+                    task={{
+                      ...task,
+                      status: task.status ?? 'todo',
+                      description: task.description ?? ''
+                    }}
+                    token={token ?? ''}
+                    onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated.id ? updated : t))}
+                  />
+                ))}
+              </ul>
+              <div className="mt-8">
+                <h3 className="text-lg font-semibold mb-2 text-green-600">Done</h3>
+                <ul className="space-y-1">
+                  {tasks.filter(task => task.status === 'done').length === 0 && (
+                    <li className="text-sm text-gray-500">No done tasks.</li>
+                  )}
+                  {tasks.filter(task => task.status === 'done').map(task => (
+                    <TaskItem
+                      key={task.id}
+                      task={{
+                        ...task,
+                        status: task.status ?? 'done',
+                        description: task.description ?? ''
+                      }}
+                      token={token ?? ''}
+                      onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated.id ? updated : t))}
+                    />
+                  ))}
+                </ul>
+              </div>
+            </>
           )}
         </div>
       </div>

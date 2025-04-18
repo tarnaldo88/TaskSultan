@@ -24,9 +24,15 @@ app.use('/api/auth', authRoutes)
 app.use('/api/user', userRoutes)
 app.use('/api/workspaces', workspaceRoutes)
 app.use('/api/workspaces', projectRoutes)
+app.use('/api', projectRoutes)
 app.use('/api', taskRoutes)
 app.use('/api', commentRoutes)
 app.use('/api', labelRoutes)
+
+// Add a catch-all 404 JSON handler to avoid HTML responses
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' })
+})
 
 // Export the app for testing
 export default app
