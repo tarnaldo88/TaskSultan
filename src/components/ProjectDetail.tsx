@@ -285,8 +285,18 @@ function ProjectDetail() {
         </div>
         <div className="flex gap-4 items-center">
           <a href="/dashboard" className="text-primary">Dashboard</a>
-          <a href="/projects" className="text-primary">Projects</a>
-          <a href="/profile" className="text-primary">Profile</a>
+          <a href="/projects" className="text-primary" onClick={e => {
+            if (!token) {
+              e.preventDefault()
+              alert('You must be signed in to view projects.')
+            }
+          }}>Projects</a>
+          <a href="/profile" className="text-primary" onClick={e => {
+            if (!token) {
+              e.preventDefault()
+              alert('You must be signed in to view your profile.')
+            }
+          }}>Profile</a>
         </div>
       </nav>
       <div className="max-w-2xl mx-auto px-4 py-8">

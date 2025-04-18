@@ -16,8 +16,13 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [token, setToken] = useState<string | null>(null)
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = localStorage.getItem('user')
+    return storedUser ? JSON.parse(storedUser) : null
+  })
+  const [token, setToken] = useState<string | null>(() => {
+    return localStorage.getItem('token') || null
+  })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -28,6 +33,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { token, user } = await authService.login({ email, password })
       setToken(token)
       setUser(user)
+      localStorage.setItem('token', token)
+      localStorage.setItem('user', JSON.stringify(user))
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -42,6 +49,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const { token, user } = await authService.register({ name, email, password })
       setToken(token)
       setUser(user)
+      localStorage.setItem('token', token)
+      localStorage.setItem('user', JSON.stringify(user))
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -56,10 +65,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const user = await authService.fetchMe(token)
       setUser(user)
+      localStorage.setItem('user', JSON.stringify(user))
     } catch (err: any) {
       setError(err.message)
       setUser(null)
       setToken(null)
+      localStorage.removeItem('user')
+      localStorage.removeItem('token')
     } finally {
       setIsLoading(false)
     }
@@ -69,6 +81,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
     setToken(null)
     setError(null)
+    localStorage.removeItem('user')
+    localStorage.removeItem('token')
   }, [])
 
   return (
