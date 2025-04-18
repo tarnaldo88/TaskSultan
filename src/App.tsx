@@ -2,7 +2,7 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom'
 import { AuthForm } from './components/auth/AuthForm'
 import { useAuth } from './store/authContext'
-import { listProjects } from './services/project'
+import { listProjects, createProject } from './services/project'
 import { createWorkspace } from './services/workspace'
 import type { Project } from './types/project'
 import type { Workspace } from './types/workspace'
@@ -99,15 +99,39 @@ function Projects() {
   const [projects, setProjects] = React.useState<Project[]>([])
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  const [newProjectName, setNewProjectName] = React.useState('')
+  const [newProjectDesc, setNewProjectDesc] = React.useState('')
+  const [creating, setCreating] = React.useState(false)
 
   React.useEffect(() => {
     if (!activeWorkspaceId || !token) return
     setLoading(true)
+    setError(null)
     listProjects({ workspaceId: activeWorkspaceId, token })
       .then(setProjects)
       .catch(e => setError(e.message))
       .finally(() => setLoading(false))
   }, [activeWorkspaceId, token])
+
+  async function handleCreateProject(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+    if (!activeWorkspaceId || !token || !newProjectName.trim()) {
+      setError('Workspace, name, and authentication required.')
+      return
+    }
+    setCreating(true)
+    try {
+      const project = await createProject({ workspaceId: activeWorkspaceId, name: newProjectName.trim(), description: newProjectDesc.trim(), token })
+      setProjects(p => [...p, project])
+      setNewProjectName('')
+      setNewProjectDesc('')
+    } catch (err: any) {
+      setError(err.message || 'Failed to create project')
+    } finally {
+      setCreating(false)
+    }
+  }
 
   function handleWorkspaceSelect(e: React.ChangeEvent<HTMLSelectElement>) {
     setActiveWorkspaceId(e.target.value)
@@ -116,16 +140,62 @@ function Projects() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black dark:bg-gray-900 dark:text-white">
       <NavBar />
-      <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-md mt-8">
-        <h1 className="text-2xl font-bold mb-4">Projects</h1>
-        {loading && <div>Loading projects...</div>}
+      <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-xl mt-8">
+        <div className="flex items-center gap-3 mb-4">
+          <h1 className="text-2xl font-bold">Projects</h1>
+          {workspaces.length > 0 && (
+            <select
+              className="ml-4 px-2 py-1 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700 text-sm"
+              value={activeWorkspaceId || ''}
+              onChange={handleWorkspaceSelect}
+              style={{ minWidth: 140 }}
+            >
+              {workspaces.map(ws => (
+                <option key={ws.id} value={ws.id}>{ws.name}</option>
+              ))}
+            </select>
+          )}
+        </div>
+        <form className="flex flex-col gap-2 mb-4" onSubmit={handleCreateProject}>
+          <input
+            type="text"
+            value={newProjectName}
+            onChange={e => setNewProjectName(e.target.value)}
+            placeholder="New project name"
+            className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+            disabled={creating || !activeWorkspaceId}
+          />
+          <input
+            type="text"
+            value={newProjectDesc}
+            onChange={e => setNewProjectDesc(e.target.value)}
+            placeholder="Description (optional)"
+            className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+            disabled={creating || !activeWorkspaceId}
+          />
+          <button
+            type="submit"
+            className="px-4 py-2 rounded bg-blue-600 text-white font-semibold disabled:opacity-50"
+            disabled={creating || !newProjectName.trim() || !activeWorkspaceId}
+          >
+            {creating ? 'Creating...' : 'Create Project'}
+          </button>
+        </form>
         {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
-        <ul className="space-y-2">
-          {projects.map(p => (
-            <li key={p.id} className="border rounded px-3 py-2">{p.name}</li>
-          ))}
-        </ul>
-        {!loading && !error && projects.length === 0 && <div>No projects found.</div>}
+        <div className="mb-2 font-semibold">Projects in Workspace:</div>
+        {loading ? (
+          <div className="text-gray-500">Loading...</div>
+        ) : (
+          <ul className="space-y-1 mb-4">
+            {projects.length === 0 && <li className="text-sm text-gray-500">No projects found.</li>}
+            {projects.map(prj => (
+              <li key={prj.id} className="text-sm">
+                <span className="font-semibold">{prj.name}</span>
+                {prj.description && <span className="ml-2 text-gray-400">{prj.description}</span>}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </div>
   )
