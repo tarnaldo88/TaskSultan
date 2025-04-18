@@ -3,7 +3,10 @@ import { useParams } from 'react-router-dom'
 import { useAuth } from '../store/authContext'
 import { getProject } from '../services/project'
 import { listTasks, createTask, updateTask } from '../services/task'
+import { fetchComments, addComment } from '../services/comment'
 import type { Task } from '../types/task'
+import type { Comment } from '../types/comment'
+import { TaskComments } from './task-comments/TaskComments'
 
 function ProjectDetail() {
   const { projectId } = useParams()
@@ -18,6 +21,11 @@ function ProjectDetail() {
   const [newTaskDesc, setNewTaskDesc] = React.useState('')
   const [creatingTask, setCreatingTask] = React.useState(false)
   const [subtaskParentId, setSubtaskParentId] = React.useState<string | null>(null)
+
+  // --- Comments state ---
+  const [commentsByTask, setCommentsByTask] = React.useState<Record<string, Comment[]>>({})
+  const [commentsLoadingTaskId, setCommentsLoadingTaskId] = React.useState<string | null>(null)
+  const [commentsErrorTaskId, setCommentsErrorTaskId] = React.useState<Record<string, string | null>>({})
 
   React.useEffect(() => {
     if (!projectId || !token) return
@@ -39,25 +47,39 @@ function ProjectDetail() {
       .finally(() => setTaskLoading(false))
   }, [projectId, token])
 
-  if (!projectId) return <div className="p-8 text-red-500">Invalid project URL: missing projectId.</div>
-
-  async function handleCreateTask(e: React.FormEvent) {
-    e.preventDefault()
-    setTaskError(null)
-    if (!projectId || !token || !newTaskTitle.trim()) {
-      setTaskError('Task title and authentication required.')
-      return
-    }
-    setCreatingTask(true)
+  // Fetch comments for a given taskId
+  async function fetchAndSetComments(taskId: string) {
+    if (!taskId || !token) return
+    setCommentsLoadingTaskId(taskId)
+    setCommentsErrorTaskId(e => ({ ...e, [taskId]: null }))
     try {
-      const task = await createTask({ projectId, title: newTaskTitle.trim(), description: newTaskDesc.trim(), token })
-      setTasks(t => [...t, task])
-      setNewTaskTitle('')
-      setNewTaskDesc('')
-    } catch (err: any) {
-      setTaskError(err.message || 'Failed to create task')
+      const comments = await fetchComments({ taskId, token })
+      setCommentsByTask(prev => ({ ...prev, [taskId]: comments }))
+    } catch (e: any) {
+      setCommentsErrorTaskId(errs => ({ ...errs, [taskId]: e.message }))
     } finally {
-      setCreatingTask(false)
+      setCommentsLoadingTaskId(null)
+    }
+  }
+
+  // Fetch comments for all tasks on load (could be optimized for visible/expanded tasks only)
+  React.useEffect(() => {
+    if (!token) return
+    const taskIds = [projectId, ...tasks.flatMap(t => [t.id, ...(t.subtasks?.map(st => st.id) || [])])].filter(Boolean) as string[]
+    taskIds.forEach(id => fetchAndSetComments(id))
+  }, [projectId, token, tasks])
+
+  async function handleAddComment(taskId: string, content: string) {
+    if (!taskId || !token) return
+    setCommentsLoadingTaskId(taskId)
+    setCommentsErrorTaskId(e => ({ ...e, [taskId]: null }))
+    try {
+      const comment = await addComment({ taskId, content, token })
+      setCommentsByTask(prev => ({ ...prev, [taskId]: [comment, ...(prev[taskId] || [])] }))
+    } catch (e: any) {
+      setCommentsErrorTaskId(errs => ({ ...errs, [taskId]: e.message }))
+    } finally {
+      setCommentsLoadingTaskId(null)
     }
   }
 
@@ -265,9 +287,29 @@ function ProjectDetail() {
     )
   }
 
+  if (!projectId) return <div className="p-8 text-red-500">Invalid project URL: missing projectId.</div>
+
   if (loading) return <div className="p-8">Loading project...</div>
   if (error) return <div className="text-red-500 p-8">{error}</div>
   if (!project) return <div className="p-8">Project not found.</div>
+
+  function handleCreateTask(e: React.FormEvent) {
+    e.preventDefault()
+    setTaskError(null)
+    if (!projectId || !token || !newTaskTitle.trim()) {
+      setTaskError('Task title and authentication required.')
+      return
+    }
+    setCreatingTask(true)
+    createTask({ projectId, title: newTaskTitle.trim(), description: newTaskDesc.trim(), token })
+      .then(task => {
+        setTasks(t => [...t, task])
+        setNewTaskTitle('')
+        setNewTaskDesc('')
+      })
+      .catch(err => setTaskError(err.message || 'Failed to create task'))
+      .finally(() => setCreatingTask(false))
+  }
 
   return (
     <div className="min-h-screen bg-white text-black dark:bg-gray-900 dark:text-white">
@@ -340,16 +382,24 @@ function ProjectDetail() {
                     <li className="text-sm text-gray-500">No tasks found.</li>
                   )}
                   {tasks.filter(task => task.status !== 'done').map(task => (
-                    <TaskItem
-                      key={task.id}
-                      task={{
-                        ...task,
-                        status: task.status ?? 'todo',
-                        description: task.description ?? ''
-                      }}
-                      token={token ?? ''}
-                      onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated.id ? updated : t))}
-                    />
+                    <div key={task.id} className="mb-6">
+                      <TaskItem
+                        task={{
+                          ...task,
+                          status: task.status ?? 'todo',
+                          description: task.description ?? ''
+                        }}
+                        token={token ?? ''}
+                        onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated.id ? updated : t))}
+                      />
+                      <TaskComments
+                        taskId={task.id}
+                        comments={commentsByTask[task.id] || []}
+                        onAddComment={content => handleAddComment(task.id, content)}
+                        isLoading={commentsLoadingTaskId === task.id}
+                      />
+                      {commentsErrorTaskId[task.id] && <div className="text-red-500 text-sm mt-2">{commentsErrorTaskId[task.id]}</div>}
+                    </div>
                   ))}
                 </ul>
                 <div className="mt-8">
@@ -359,21 +409,36 @@ function ProjectDetail() {
                       <li className="text-sm text-gray-500">No done tasks.</li>
                     )}
                     {tasks.filter(task => task.status === 'done').map(task => (
-                      <TaskItem
-                        key={task.id}
-                        task={{
-                          ...task,
-                          status: task.status ?? 'done',
-                          description: task.description ?? ''
-                        }}
-                        token={token ?? ''}
-                        onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated.id ? updated : t))}
-                      />
+                      <div key={task.id} className="mb-6">
+                        <TaskItem
+                          task={{
+                            ...task,
+                            status: task.status ?? 'done',
+                            description: task.description ?? ''
+                          }}
+                          token={token ?? ''}
+                          onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated.id ? updated : t))}
+                        />
+                        <TaskComments
+                          taskId={task.id}
+                          comments={commentsByTask[task.id] || []}
+                          onAddComment={content => handleAddComment(task.id, content)}
+                          isLoading={commentsLoadingTaskId === task.id}
+                        />
+                        {commentsErrorTaskId[task.id] && <div className="text-red-500 text-sm mt-2">{commentsErrorTaskId[task.id]}</div>}
+                      </div>
                     ))}
                   </ul>
                 </div>
               </>
             )}
+            <TaskComments
+              taskId={projectId || ''}
+              comments={commentsByTask[projectId || ''] || []}
+              onAddComment={content => handleAddComment(projectId || '', content)}
+              isLoading={commentsLoadingTaskId === projectId}
+            />
+            {commentsErrorTaskId[projectId || ''] && <div className="text-red-500 text-sm mt-2">{commentsErrorTaskId[projectId || '']}</div>}
           </div>
         </div>
       </div>
