@@ -160,7 +160,7 @@ function ProjectDetail() {
 
     if (editing) {
       return (
-        <li className="text-sm border-b border-gray-200 dark:border-gray-700 py-2 flex items-center gap-2">
+        <li className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-4 mb-6 flex flex-col gap-2 transition-all">
           <input
             type="text"
             value={title}
@@ -197,9 +197,11 @@ function ProjectDetail() {
     }
 
     return (
-      <li className="text-sm border-b border-gray-200 dark:border-gray-700 py-2 flex flex-col gap-1">
+      <li className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-4 mb-6 flex flex-col gap-2 transition-all">
         <div className="flex items-center gap-2">
-          <span className="font-semibold">{task.title}</span>
+          <span className="font-semibold text-lg md:text-xl text-purple-500/90 drop-shadow-sm tracking-tight">
+            {task.title}
+          </span>
           {task.description && <span className="ml-2 text-gray-400">{task.description}</span>}
           <span className="ml-4 text-xs text-gray-400">{task.status}</span>
           <select
@@ -341,7 +343,7 @@ function ProjectDetail() {
           }}>Profile</a>
         </div>
       </nav>
-      <div className="max-w-2xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-4 py-8">
         <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full">
           <h1 className="text-2xl font-bold mb-2">{project.name ?? ''}</h1>
           {project.description && <div className="mb-4 text-gray-400">{project.description}</div>}
@@ -432,13 +434,6 @@ function ProjectDetail() {
                 </div>
               </>
             )}
-            <TaskComments
-              taskId={projectId || ''}
-              comments={commentsByTask[projectId || ''] || []}
-              onAddComment={content => handleAddComment(projectId || '', content)}
-              isLoading={commentsLoadingTaskId === projectId}
-            />
-            {commentsErrorTaskId[projectId || ''] && <div className="text-red-500 text-sm mt-2">{commentsErrorTaskId[projectId || '']}</div>}
           </div>
         </div>
       </div>
