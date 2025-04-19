@@ -47,48 +47,50 @@ function Dashboard() {
   console.log('Dashboard render workspaces:', workspaces)
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black dark:bg-gray-900 dark:text-white">
+    <div className="min-h-screen flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white">
       <NavBar />
-      <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-md mt-8">
-        {/* Dashboard header with logo and title */}
-        <div className="flex items-center gap-3 mb-4">
-          <img
-            src="/img/LogoSultan.png"
-            alt="TaskSultan Logo"
-            width={50}
-            height={50}
-            className="h-[50px] w-[50px] object-contain drop-shadow"
-            draggable="false"
-          />
-          <h1 className="text-2xl font-bold">Task Sultan</h1>
+      <div className="flex flex-col items-center justify-center flex-1">
+        <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-md mt-8">
+          {/* Dashboard header with logo and title */}
+          <div className="flex items-center gap-3 mb-4">
+            <img
+              src="/img/LogoSultan.png"
+              alt="TaskSultan Logo"
+              width={50}
+              height={50}
+              className="h-[50px] w-[50px] object-contain drop-shadow order-1"
+              draggable="false"
+            />
+            <h1 className="text-2xl font-bold order-2">Task Sultan</h1>
+          </div>
+          <p className="mb-4">Welcome, <span className="font-semibold">{user?.name}</span>!</p>
+          <form className="flex gap-2 mb-4" onSubmit={handleCreateWorkspace}>
+            <input
+              type="text"
+              value={newWorkspace}
+              onChange={e => setNewWorkspace(e.target.value)}
+              placeholder="New workspace name"
+              className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              disabled={creating}
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
+              disabled={creating || !newWorkspace.trim()}
+            >
+              {creating ? 'Creating...' : 'Create'}
+            </button>
+          </form>
+          {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+          <div className="mb-2 font-semibold">Your Workspaces:</div>
+          <ul className="space-y-1 mb-4">
+            {workspaces.length === 0 && <li className="text-sm text-gray-500">No workspaces found.</li>}
+            {workspaces.map(ws => (
+              <li key={ws.id} className="text-sm">{ws.name}</li>
+            ))}
+          </ul>
+          <button className="px-4 py-2 rounded bg-primary text-white" onClick={logout}>Logout</button>
         </div>
-        <p className="mb-4">Welcome, <span className="font-semibold">{user?.name}</span>!</p>
-        <form className="flex gap-2 mb-4" onSubmit={handleCreateWorkspace}>
-          <input
-            type="text"
-            value={newWorkspace}
-            onChange={e => setNewWorkspace(e.target.value)}
-            placeholder="New workspace name"
-            className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
-            disabled={creating}
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
-            disabled={creating || !newWorkspace.trim()}
-          >
-            {creating ? 'Creating...' : 'Create'}
-          </button>
-        </form>
-        {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
-        <div className="mb-2 font-semibold">Your Workspaces:</div>
-        <ul className="space-y-1 mb-4">
-          {workspaces.length === 0 && <li className="text-sm text-gray-500">No workspaces found.</li>}
-          {workspaces.map(ws => (
-            <li key={ws.id} className="text-sm">{ws.name}</li>
-          ))}
-        </ul>
-        <button className="px-4 py-2 rounded bg-primary text-white" onClick={logout}>Logout</button>
       </div>
     </div>
   )
@@ -139,69 +141,60 @@ function Projects() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black dark:bg-gray-900 dark:text-white">
+    <div className="min-h-screen flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white">
       <NavBar />
-      <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-xl mt-8">
-        <div className="flex items-center gap-3 mb-4">
-          <h1 className="text-2xl font-bold">Projects</h1>
-          {workspaces.length > 0 && (
-            <select
-              className="ml-4 px-2 py-1 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700 text-sm"
-              value={activeWorkspaceId || ''}
-              onChange={handleWorkspaceSelect}
-              style={{ minWidth: 140 }}
+      <div className="flex flex-col items-center justify-center flex-1">
+        <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-xl mt-8">
+          <div className="flex items-center gap-3 mb-4">
+            <h1 className="text-2xl font-bold">Projects</h1>
+          </div>
+          <form className="flex flex-col gap-2 mb-4" onSubmit={handleCreateProject}>
+            <input
+              type="text"
+              value={newProjectName}
+              onChange={e => setNewProjectName(e.target.value)}
+              placeholder="New project name"
+              className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              disabled={creating || !activeWorkspaceId}
+            />
+            <input
+              type="text"
+              value={newProjectDesc}
+              onChange={e => setNewProjectDesc(e.target.value)}
+              placeholder="Description (optional)"
+              className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              disabled={creating || !activeWorkspaceId}
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
+              disabled={creating || !newProjectName.trim() || !activeWorkspaceId}
             >
-              {workspaces.map(ws => (
-                <option key={ws.id} value={ws.id}>{ws.name}</option>
+              {creating ? 'Creating...' : 'Create Project'}
+            </button>
+          </form>
+          <hr className="my-4 border-t border-gray-300 dark:border-gray-700" />
+          {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
+          <div className="mb-2 font-semibold">Projects in Workspace:</div>
+          {loading ? (
+            <div className="text-gray-500">Loading...</div>
+          ) : (
+            <ul className="space-y-1 mb-4">
+              {projects.length === 0 && <li className="text-sm text-gray-500">No projects found.</li>}
+              {projects.map(prj => (
+                <li key={prj.id} className="text-sm">
+                  <Link
+                    to={`/projects/${prj.id}`}
+                    className="font-semibold text-primary hover:underline"
+                  >
+                    {prj.name}
+                  </Link>
+                  {prj.description && <span className="ml-2 text-gray-400">{prj.description}</span>}
+                </li>
               ))}
-            </select>
+            </ul>
           )}
         </div>
-        <form className="flex flex-col gap-2 mb-4" onSubmit={handleCreateProject}>
-          <input
-            type="text"
-            value={newProjectName}
-            onChange={e => setNewProjectName(e.target.value)}
-            placeholder="New project name"
-            className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
-            disabled={creating || !activeWorkspaceId}
-          />
-          <input
-            type="text"
-            value={newProjectDesc}
-            onChange={e => setNewProjectDesc(e.target.value)}
-            placeholder="Description (optional)"
-            className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
-            disabled={creating || !activeWorkspaceId}
-          />
-          <button
-            type="submit"
-            className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
-            disabled={creating || !newProjectName.trim() || !activeWorkspaceId}
-          >
-            {creating ? 'Creating...' : 'Create Project'}
-          </button>
-        </form>
-        {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
-        <div className="mb-2 font-semibold">Projects in Workspace:</div>
-        {loading ? (
-          <div className="text-gray-500">Loading...</div>
-        ) : (
-          <ul className="space-y-1 mb-4">
-            {projects.length === 0 && <li className="text-sm text-gray-500">No projects found.</li>}
-            {projects.map(prj => (
-              <li key={prj.id} className="text-sm">
-                <Link
-                  to={`/projects/${prj.id}`}
-                  className="font-semibold text-primary hover:underline"
-                >
-                  {prj.name}
-                </Link>
-                {prj.description && <span className="ml-2 text-gray-400">{prj.description}</span>}
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
     </div>
   )
@@ -210,12 +203,14 @@ function Projects() {
 function Profile() {
   const { user } = useAuth()
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-white text-black dark:bg-gray-900 dark:text-white">
+    <div className="min-h-screen flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white">
       <NavBar />
-      <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-md mt-8">
-        <h1 className="text-2xl font-bold mb-4">Profile</h1>
-        <p className="mb-4">Email: <span className="font-semibold">{user?.email}</span></p>
-        <p>Name: <span className="font-semibold">{user?.name}</span></p>
+      <div className="flex flex-col items-center justify-center flex-1">
+        <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-md mt-8">
+          <h1 className="text-2xl font-bold mb-4">Profile</h1>
+          <p className="mb-4">Email: <span className="font-semibold">{user?.email}</span></p>
+          <p>Name: <span className="font-semibold">{user?.name}</span></p>
+        </div>
       </div>
     </div>
   )
@@ -233,7 +228,15 @@ function NavBar() {
   return (
     <nav className="w-full flex items-center justify-between px-8 py-4 bg-card shadow">
       <div className="flex items-center gap-4">
-        <Link to="/dashboard" className="font-bold text-lg text-primary">TaskSultan</Link>
+        <img
+          src="/img/LogoSultan.png"
+          alt="TaskSultan Logo"
+          width={36}
+          height={36}
+          className="h-9 w-9 object-contain drop-shadow order-1"
+          draggable="false"
+        />
+        <span className="text-lg font-bold text-primary order-2">Task Sultan</span>
         {workspaces.length > 0 && (
           <select
             className="ml-4 px-2 py-1 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700 text-sm"
