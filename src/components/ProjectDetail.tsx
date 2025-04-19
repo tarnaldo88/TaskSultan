@@ -154,6 +154,25 @@ function ProjectDetail() {
     const [subtaskError, setSubtaskError] = React.useState<string | null>(null)
     const [editLabels, setEditLabels] = React.useState<string[]>(task.labels?.map(l => l.id) || [])
 
+    const [showLabelSelect, setShowLabelSelect] = React.useState(false)
+    const labelSelectRef = React.useRef<HTMLDivElement>(null)
+
+    React.useEffect(() => {
+      function handleClick(e: MouseEvent) {
+        if (showLabelSelect && labelSelectRef.current && !labelSelectRef.current.contains(e.target as Node))
+          setShowLabelSelect(false)
+      }
+      document.addEventListener('mousedown', handleClick)
+      return () => document.removeEventListener('mousedown', handleClick)
+    }, [showLabelSelect])
+
+    function handleQuickLabelChange(ids: string[]) {
+      setEditLabels(ids)
+      updateTask({ id: task.id, token, labels: ids })
+        .then(onUpdate)
+        .finally(() => setShowLabelSelect(false))
+    }
+
     async function handleCreateSubtask() {
       setSubtaskError(null)
       if (!projectId || !token || !subtaskTitle.trim()) {
@@ -261,6 +280,24 @@ function ProjectDetail() {
               ))}
             </span>
           )}
+          <button
+            type="button"
+            className="ml-1 px-1 py-0.5 rounded bg-purple-200 hover:bg-purple-400 text-purple-900 text-xs font-bold"
+            title="Quick add/remove labels"
+            onClick={() => setShowLabelSelect(v => !v)}
+          >
+            +
+          </button>
+          {showLabelSelect && (
+            <div ref={labelSelectRef} className="absolute z-50 mt-8 ml-2 bg-white dark:bg-gray-900 border border-purple-300 dark:border-purple-700 rounded shadow-lg p-2">
+              <LabelSelect
+                labels={labels}
+                selected={editLabels}
+                onChange={handleQuickLabelChange}
+                disabled={saving || labelsLoading}
+              />
+            </div>
+          )}
           {task.description && <span className="ml-2 text-gray-400">{task.description}</span>}
           {/* Status Dropdown */}
           <select
@@ -365,7 +402,7 @@ function ProjectDetail() {
             onClick={() => setEditing(true)}
             aria-label="Edit Task"
           >
-            Add Label
+            Edit
           </button>
         </div>
         {isAddingSubtask && (
@@ -428,7 +465,7 @@ function ProjectDetail() {
   if (error) return <div className="text-red-500 p-8">{error}</div>
   if (!project) return <div className="p-8">Project not found.</div>
 
-  function handleCreateTask(e: React.FormEvent) {
+  async function handleCreateTask(e: React.FormEvent) {
     e.preventDefault()
     setTaskError(null)
     if (!projectId || !token || !newTaskTitle.trim()) {
