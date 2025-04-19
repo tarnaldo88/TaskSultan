@@ -5,10 +5,15 @@ import { getProject } from '../services/project'
 import { listTasks, createTask, updateTask, deleteTask } from '../services/task'
 import { fetchComments, addComment } from '../services/comment'
 import { listWorkspaceMembers } from '../services/workspace'
+import { listLabels } from '../services/label'
 import type { Task } from '../types/task'
 import type { Comment } from '../types/comment'
 import type { User } from '../types/user'
+import type { Label } from '../types/label'
 import { TaskComments } from './task-comments/TaskComments'
+import { LabelSelect } from './LabelSelect'
+import { LabelBadge } from './LabelBadge'
+import { LabelManager } from './LabelManager'
 
 function ProjectDetail() {
   const { projectId } = useParams()
@@ -23,6 +28,7 @@ function ProjectDetail() {
   const [newTaskDesc, setNewTaskDesc] = React.useState('')
   const [creatingTask, setCreatingTask] = React.useState(false)
   const [subtaskParentId, setSubtaskParentId] = React.useState<string | null>(null)
+  const [newTaskLabels, setNewTaskLabels] = React.useState<string[]>([])
 
   // --- Comments state ---
   const [commentsByTask, setCommentsByTask] = React.useState<Record<string, Comment[]>>({})
@@ -33,6 +39,11 @@ function ProjectDetail() {
   const [members, setMembers] = React.useState<User[]>([])
   const [membersLoading, setMembersLoading] = React.useState(false)
   const [membersError, setMembersError] = React.useState<string | null>(null)
+
+  // --- Labels state ---
+  const [labels, setLabels] = React.useState<Label[]>([])
+  const [labelsLoading, setLabelsLoading] = React.useState(false)
+  const [labelsError, setLabelsError] = React.useState<string | null>(null)
 
   React.useEffect(() => {
     if (!projectId || !token) return
@@ -69,6 +80,16 @@ function ProjectDetail() {
       }
     }
     fetchMembers()
+  }, [project?.workspaceId, token])
+
+  React.useEffect(() => {
+    if (!project?.workspaceId || !token) return
+    setLabelsLoading(true)
+    setLabelsError(null)
+    listLabels({ workspaceId: project.workspaceId, token })
+      .then(setLabels)
+      .catch(e => setLabelsError(e.message))
+      .finally(() => setLabelsLoading(false))
   }, [project?.workspaceId, token])
 
   // Fetch comments for a given taskId
@@ -131,6 +152,7 @@ function ProjectDetail() {
     const [subtaskDesc, setSubtaskDesc] = React.useState('')
     const [creatingSubtask, setCreatingSubtask] = React.useState(false)
     const [subtaskError, setSubtaskError] = React.useState<string | null>(null)
+    const [editLabels, setEditLabels] = React.useState<string[]>(task.labels?.map(l => l.id) || [])
 
     async function handleCreateSubtask() {
       setSubtaskError(null)
@@ -163,7 +185,7 @@ function ProjectDetail() {
       setSaving(true)
       setError(null)
       try {
-        const updated = await updateTask({ id: task.id, token, title: title.trim(), description: description.trim() })
+        const updated = await updateTask({ id: task.id, token, title: title.trim(), description: description.trim(), labels: editLabels })
         onUpdate(updated)
         setEditing(false)
       } catch (err: any) {
@@ -199,6 +221,12 @@ function ProjectDetail() {
             className="px-2 py-1 rounded border text-sm dark:bg-gray-900 dark:text-white dark:border-gray-700 w-48"
             disabled={saving}
           />
+          <LabelSelect
+            labels={labels}
+            selected={editLabels}
+            onChange={setEditLabels}
+            disabled={saving || labelsLoading}
+          />
           <button
             type="button"
             className="px-2 py-1 rounded bg-green-600 text-white text-xs font-semibold disabled:opacity-50"
@@ -226,6 +254,13 @@ function ProjectDetail() {
           <span className="font-semibold text-lg md:text-xl text-purple-500/90 drop-shadow-sm tracking-tight">
             {task.title}
           </span>
+          {task.labels && task.labels.length > 0 && (
+            <span className="flex flex-wrap gap-1 ml-2">
+              {task.labels.map(label => (
+                <LabelBadge key={label.id} label={label} />
+              ))}
+            </span>
+          )}
           {task.description && <span className="ml-2 text-gray-400">{task.description}</span>}
           {/* Status Dropdown */}
           <select
@@ -393,11 +428,12 @@ function ProjectDetail() {
       return
     }
     setCreatingTask(true)
-    createTask({ projectId, title: newTaskTitle.trim(), description: newTaskDesc.trim(), token })
+    createTask({ projectId, title: newTaskTitle.trim(), description: newTaskDesc.trim(), token, labels: newTaskLabels })
       .then(task => {
         setTasks(t => [...t, task])
         setNewTaskTitle('')
         setNewTaskDesc('')
+        setNewTaskLabels([])
       })
       .catch(err => setTaskError(err.message || 'Failed to create task'))
       .finally(() => setCreatingTask(false))
@@ -437,7 +473,10 @@ function ProjectDetail() {
         
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 mb-12 border border-purple-200 dark:border-purple-700">
           <h2 className="text-xl font-semibold mb-2">Tasks</h2>
-          <form className="flex flex-col gap-2 mb-4" onSubmit={handleCreateTask}>
+          {project?.workspaceId && token && (
+            <LabelManager workspaceId={project.workspaceId} token={token} />
+          )}
+          <form onSubmit={handleCreateTask} className="flex flex-col gap-2 mb-8">
             <input
               type="text"
               value={newTaskTitle}
@@ -454,6 +493,12 @@ function ProjectDetail() {
               className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
               disabled={creatingTask}
             />
+            <LabelSelect
+              labels={labels}
+              selected={newTaskLabels}
+              onChange={setNewTaskLabels}
+              disabled={creatingTask || labelsLoading}
+            />
             <button
               type="submit"
               className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
@@ -461,8 +506,8 @@ function ProjectDetail() {
             >
               {creatingTask ? 'Creating...' : 'Add Task'}
             </button>
+            {taskError && <div className="text-red-500 text-sm mb-2">{taskError}</div>}
           </form>
-          {taskError && <div className="text-red-500 text-sm mb-2">{taskError}</div>}
         </div>
         <hr className="border-t-2 border-purple-300 dark:border-purple-700 mb-10" />
         {taskLoading ? (

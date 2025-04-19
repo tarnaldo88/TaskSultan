@@ -1,3 +1,5 @@
+import type { Label } from './label'
+
 export interface Task {
   id: string
   title: string
@@ -15,6 +17,7 @@ export interface Task {
   projectId: string
   parentTaskId?: string
   subtasks?: Task[]
+  labels?: Label[]
   createdAt: string
   updatedAt: string
 }

@@ -20,16 +20,17 @@ export interface CreateTaskParams {
   description?: string
   token: string
   parentTaskId?: string
+  labels?: string[]
 }
 
-export async function createTask({ projectId, title, description, token, parentTaskId }: CreateTaskParams): Promise<Task> {
+export async function createTask({ projectId, title, description, token, parentTaskId, labels }: CreateTaskParams): Promise<Task> {
   const res = await fetch(`http://localhost:4000/api/projects/${projectId}/tasks`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify({ title, description, parentTaskId })
+    body: JSON.stringify({ title, description, parentTaskId, labels })
   })
   if (!res.ok) throw new Error((await res.json()).error || 'Failed to create task')
   const data = await res.json()
@@ -45,16 +46,17 @@ export interface UpdateTaskParams {
   priority?: string
   dueDate?: string
   assigneeId?: string
+  labels?: string[]
 }
 
-export async function updateTask({ id, token, ...fields }: UpdateTaskParams): Promise<Task> {
+export async function updateTask({ id, token, labels, ...fields }: UpdateTaskParams): Promise<Task> {
   const res = await fetch(`http://localhost:4000/api/tasks/${id}`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`
     },
-    body: JSON.stringify(fields)
+    body: JSON.stringify({ ...fields, labels })
   })
   if (!res.ok) throw new Error((await res.json()).error || 'Failed to update task')
   const data = await res.json()
