@@ -433,99 +433,97 @@ function ProjectDetail() {
           }}>Profile</a>
         </div>
       </nav>
-      <div className="max-w-5xl mx-auto px-4 py-8">
-        <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full">
-          <h1 className="text-2xl font-bold mb-2">{project.name ?? ''}</h1>
-          {project.description && <div className="mb-4 text-gray-400">{project.description}</div>}
-          <div className="mt-8">
-            <h2 className="text-xl font-semibold mb-2">Tasks</h2>
-            <form className="flex flex-col gap-2 mb-4" onSubmit={handleCreateTask}>
-              <input
-                type="text"
-                value={newTaskTitle}
-                onChange={e => setNewTaskTitle(e.target.value)}
-                placeholder="Task title"
-                className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
-                disabled={creatingTask}
-              />
-              <input
-                type="text"
-                value={newTaskDesc}
-                onChange={e => setNewTaskDesc(e.target.value)}
-                placeholder="Description (optional)"
-                className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
-                disabled={creatingTask}
-              />
-              <button
-                type="submit"
-                className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
-                disabled={creatingTask || !newTaskTitle.trim()}
-              >
-                {creatingTask ? 'Creating...' : 'Add Task'}
-              </button>
-            </form>
-            {taskError && <div className="text-red-500 text-sm mb-2">{taskError}</div>}
-            {taskLoading ? (
-              <div className="text-gray-500">Loading tasks...</div>
-            ) : (
-              <>
-                <ul className="space-y-1">
-                  {tasks.filter(task => task.status !== 'done').length === 0 && (
-                    <li className="text-sm text-gray-500">No tasks found.</li>
-                  )}
-                  {tasks.filter(task => task.status !== 'done').map(task => (
-                    <div key={task.id} className="mb-6">
-                      <TaskItem
-                        task={{
-                          ...task,
-                          status: task.status ?? 'todo',
-                          description: task.description ?? ''
-                        }}
-                        token={token ?? ''}
-                        onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated?.id ? updated : t))}
-                      />
-                      <TaskComments
-                        taskId={task.id}
-                        comments={commentsByTask[task.id] || []}
-                        onAddComment={content => handleAddComment(task.id, content)}
-                        isLoading={commentsLoadingTaskId === task.id}
-                      />
-                      {commentsErrorTaskId[task.id] && <div className="text-red-500 text-sm mt-2">{commentsErrorTaskId[task.id]}</div>}
-                    </div>
-                  ))}
-                </ul>
-                <div className="mt-8">
-                  <h3 className="text-3xl md:text-4xl font-bold mb-6 text-green-700 tracking-tight drop-shadow-lg">Done</h3>
-                  <ul className="space-y-1">
-                    {tasks.filter(task => task.status === 'done').length === 0 && (
-                      <li className="text-sm text-gray-500">No done tasks.</li>
-                    )}
-                    {tasks.filter(task => task.status === 'done').map(task => (
-                      <div key={task.id} className="mb-6">
-                        <TaskItem
-                          task={{
-                            ...task,
-                            status: task.status ?? 'done',
-                            description: task.description ?? ''
-                          }}
-                          token={token ?? ''}
-                          onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated?.id ? updated : t))}
-                        />
-                        <TaskComments
-                          taskId={task.id}
-                          comments={commentsByTask[task.id] || []}
-                          onAddComment={content => handleAddComment(task.id, content)}
-                          isLoading={commentsLoadingTaskId === task.id}
-                        />
-                        {commentsErrorTaskId[task.id] && <div className="text-red-500 text-sm mt-2">{commentsErrorTaskId[task.id]}</div>}
-                      </div>
-                    ))}
-                  </ul>
-                </div>
-              </>
-            )}
-          </div>
+      <div className="max-w-4xl mx-auto px-4 py-12">
+        
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 mb-12 border border-purple-200 dark:border-purple-700">
+          <h2 className="text-xl font-semibold mb-2">Tasks</h2>
+          <form className="flex flex-col gap-2 mb-4" onSubmit={handleCreateTask}>
+            <input
+              type="text"
+              value={newTaskTitle}
+              onChange={e => setNewTaskTitle(e.target.value)}
+              placeholder="Task title"
+              className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              disabled={creatingTask}
+            />
+            <input
+              type="text"
+              value={newTaskDesc}
+              onChange={e => setNewTaskDesc(e.target.value)}
+              placeholder="Description (optional)"
+              className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              disabled={creatingTask}
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
+              disabled={creatingTask || !newTaskTitle.trim()}
+            >
+              {creatingTask ? 'Creating...' : 'Add Task'}
+            </button>
+          </form>
+          {taskError && <div className="text-red-500 text-sm mb-2">{taskError}</div>}
         </div>
+        <hr className="border-t-2 border-purple-300 dark:border-purple-700 mb-10" />
+        {taskLoading ? (
+          <div className="text-gray-500">Loading tasks...</div>
+        ) : (
+          <>
+            <ul className="space-y-1">
+              {tasks.filter(task => task.status !== 'done').length === 0 && (
+                <li className="text-sm text-gray-500">No tasks found.</li>
+              )}
+              {tasks.filter(task => task.status !== 'done').map(task => (
+                <div key={task.id} className="mb-6">
+                  <TaskItem
+                    task={{
+                      ...task,
+                      status: task.status ?? 'todo',
+                      description: task.description ?? ''
+                    }}
+                    token={token ?? ''}
+                    onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated?.id ? updated : t))}
+                  />
+                  <TaskComments
+                    taskId={task.id}
+                    comments={commentsByTask[task.id] || []}
+                    onAddComment={content => handleAddComment(task.id, content)}
+                    isLoading={commentsLoadingTaskId === task.id}
+                  />
+                  {commentsErrorTaskId[task.id] && <div className="text-red-500 text-sm mt-2">{commentsErrorTaskId[task.id]}</div>}
+                </div>
+              ))}
+            </ul>
+            <div className="mt-8">
+              <h3 className="text-3xl md:text-4xl font-bold mb-6 text-green-700 tracking-tight drop-shadow-lg">Done</h3>
+              <ul className="space-y-1">
+                {tasks.filter(task => task.status === 'done').length === 0 && (
+                  <li className="text-sm text-gray-500">No done tasks.</li>
+                )}
+                {tasks.filter(task => task.status === 'done').map(task => (
+                  <div key={task.id} className="mb-6">
+                    <TaskItem
+                      task={{
+                        ...task,
+                        status: task.status ?? 'done',
+                        description: task.description ?? ''
+                      }}
+                      token={token ?? ''}
+                      onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated?.id ? updated : t))}
+                    />
+                    <TaskComments
+                      taskId={task.id}
+                      comments={commentsByTask[task.id] || []}
+                      onAddComment={content => handleAddComment(task.id, content)}
+                      isLoading={commentsLoadingTaskId === task.id}
+                    />
+                    {commentsErrorTaskId[task.id] && <div className="text-red-500 text-sm mt-2">{commentsErrorTaskId[task.id]}</div>}
+                  </div>
+                ))}
+              </ul>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
