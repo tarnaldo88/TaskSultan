@@ -495,7 +495,7 @@ function ProjectDetail() {
                   ))}
                 </ul>
                 <div className="mt-8">
-                  <h3 className="text-lg font-semibold mb-2 text-green-600">Done</h3>
+                  <h3 className="text-3xl md:text-4xl font-bold mb-6 text-green-700 tracking-tight drop-shadow-lg">Done</h3>
                   <ul className="space-y-1">
                     {tasks.filter(task => task.status === 'done').length === 0 && (
                       <li className="text-sm text-gray-500">No done tasks.</li>
