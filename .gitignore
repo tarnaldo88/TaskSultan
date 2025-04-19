@@ -23,8 +23,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Project rules files
-.windsurfrules
-global_rules.md
+# .windsurfrules
+# global_rules.md
 
 # IDEs and editors
 /.idea
