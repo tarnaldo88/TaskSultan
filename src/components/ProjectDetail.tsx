@@ -206,7 +206,7 @@ function ProjectDetail() {
 
     if (editing) {
       return (
-        <li className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-4 mb-6 flex flex-col gap-2 transition-all">
+        <li className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-8 mb-6 flex flex-col gap-2 transition-all max-w-3xl mx-auto">
           <input
             type="text"
             value={title}
@@ -249,8 +249,8 @@ function ProjectDetail() {
     }
 
     return (
-      <li className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-4 mb-6 flex flex-col gap-2 transition-all">
-        <div className="flex items-center gap-2">
+      <li className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-8 mb-6 flex flex-col gap-2 transition-all max-w-3xl mx-auto">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="font-semibold text-lg md:text-xl text-purple-500/90 drop-shadow-sm tracking-tight">
             {task.title}
           </span>
@@ -354,10 +354,18 @@ function ProjectDetail() {
           </button>
           <button
             type="button"
-            className="ml-2 px-2 py-1 rounded bg-green-600 text-white text-xs font-semibold"
+            className="ml-2 px-2 py-1 rounded bg-purple-500 text-white text-xs font-semibold hover:bg-green-600 transition"
             onClick={() => setSubtaskParentId(task.id)}
           >
             + Subtask
+          </button>
+          <button
+            type="button"
+            className="ml-2 px-2 py-1 rounded bg-blue-500 text-white text-xs font-semibold hover:bg-purple-600 transition"
+            onClick={() => setEditing(true)}
+            aria-label="Edit Task"
+          >
+            Add Label
           </button>
         </div>
         {isAddingSubtask && (
