@@ -3,13 +3,14 @@ import { PrismaClient } from '@prisma/client'
 import jwt from 'jsonwebtoken'
 import app from '../index'
 
-const prisma = new PrismaClient()
 const JWT_SECRET = process.env.JWT_SECRET || 'testsecret'
+let prisma: PrismaClient
 
 describe('Comment CRUD API', () => {
   let user: any, user2: any, token: string, token2: string, task: any, comment: any
 
   beforeAll(async () => {
+    prisma = new PrismaClient()
     // Create users
     user = await prisma.user.create({ data: { email: 'test1@example.com', password: 'hashed', name: 'Test User', role: 'Member' } })
     user2 = await prisma.user.create({ data: { email: 'test2@example.com', password: 'hashed', name: 'Other User', role: 'Member' } })

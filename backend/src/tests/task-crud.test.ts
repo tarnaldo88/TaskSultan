@@ -4,13 +4,14 @@ import jwt from 'jsonwebtoken'
 import app from '../index'
 import fs from 'fs'
 
-const prisma = new PrismaClient()
 const JWT_SECRET = process.env.JWT_SECRET || 'testsecret'
+let prisma: PrismaClient
 
 describe('Task CRUD - assignment, subtasks, labels', () => {
   let user: any, user2: any, token: string, token2: string, workspace: any, project: any, label: any, task: any, subtask: any
 
   beforeAll(async () => {
+    prisma = new PrismaClient()
     // Create users
     user = await prisma.user.create({ data: { email: 'task1@example.com', password: 'hashed', name: 'Task User', role: 'Member' } })
     user2 = await prisma.user.create({ data: { email: 'task2@example.com', password: 'hashed', name: 'Other Task User', role: 'Member' } })
