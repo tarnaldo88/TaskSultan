@@ -2,7 +2,7 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 import { useAuth } from '../store/authContext'
 import { getProject } from '../services/project'
-import { listTasks, createTask, updateTask } from '../services/task'
+import { listTasks, createTask, updateTask, deleteTask } from '../services/task'
 import { fetchComments, addComment } from '../services/comment'
 import { listWorkspaceMembers } from '../services/workspace'
 import type { Task } from '../types/task'
@@ -279,7 +279,37 @@ function ProjectDetail() {
               </option>
             ))}
           </select>
-          {/* End Assignment Dropdown */}
+          {/* Delete Task Button */}
+          <button
+            type="button"
+            className="ml-2 px-2 py-1 rounded bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition"
+            onClick={async () => {
+              if (!window.confirm('Are you sure you want to delete this task?')) return
+              setSaving(true)
+              setError(null)
+              try {
+                await deleteTask({ id: task.id, token })
+                // Reload all tasks after deletion
+                if (projectId && token) {
+                  setTaskLoading(true)
+                  try {
+                    const updatedTasks = await listTasks({ projectId, token })
+                    setTasks(updatedTasks)
+                  } finally {
+                    setTaskLoading(false)
+                  }
+                }
+              } catch (err: any) {
+                setError(err.message || 'Failed to delete task')
+              } finally {
+                setSaving(false)
+              }
+            }}
+            disabled={saving}
+          >
+            Delete
+          </button>
+          {/* End Delete Task Button */}
           <button
             type="button"
             className="ml-2 px-2 py-1 rounded bg-yellow-500 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition"
@@ -452,7 +482,7 @@ function ProjectDetail() {
                           description: task.description ?? ''
                         }}
                         token={token ?? ''}
-                        onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated.id ? updated : t))}
+                        onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated?.id ? updated : t))}
                       />
                       <TaskComments
                         taskId={task.id}
@@ -479,7 +509,7 @@ function ProjectDetail() {
                             description: task.description ?? ''
                           }}
                           token={token ?? ''}
-                          onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated.id ? updated : t))}
+                          onUpdate={updated => setTasks(ts => ts.map(t => t.id === updated?.id ? updated : t))}
                         />
                         <TaskComments
                           taskId={task.id}

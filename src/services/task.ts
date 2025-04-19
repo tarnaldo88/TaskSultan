@@ -60,3 +60,13 @@ export async function updateTask({ id, token, ...fields }: UpdateTaskParams): Pr
   const data = await res.json()
   return data.task
 }
+
+export async function deleteTask({ id, token }: { id: string; token: string }): Promise<void> {
+  const res = await fetch(`http://localhost:4000/api/tasks/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  if (!res.ok) throw new Error((await res.json()).error || 'Failed to delete task')
+}
