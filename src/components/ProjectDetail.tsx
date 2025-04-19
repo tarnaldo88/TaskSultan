@@ -4,8 +4,10 @@ import { useAuth } from '../store/authContext'
 import { getProject } from '../services/project'
 import { listTasks, createTask, updateTask } from '../services/task'
 import { fetchComments, addComment } from '../services/comment'
+import { listWorkspaceMembers } from '../services/workspace'
 import type { Task } from '../types/task'
 import type { Comment } from '../types/comment'
+import type { User } from '../types/user'
 import { TaskComments } from './task-comments/TaskComments'
 
 function ProjectDetail() {
@@ -27,6 +29,11 @@ function ProjectDetail() {
   const [commentsLoadingTaskId, setCommentsLoadingTaskId] = React.useState<string | null>(null)
   const [commentsErrorTaskId, setCommentsErrorTaskId] = React.useState<Record<string, string | null>>({})
 
+  // --- Assignment state ---
+  const [members, setMembers] = React.useState<User[]>([])
+  const [membersLoading, setMembersLoading] = React.useState(false)
+  const [membersError, setMembersError] = React.useState<string | null>(null)
+
   React.useEffect(() => {
     if (!projectId || !token) return
     setLoading(true)
@@ -46,6 +53,23 @@ function ProjectDetail() {
       .catch(e => setTaskError(e.message))
       .finally(() => setTaskLoading(false))
   }, [projectId, token])
+
+  React.useEffect(() => {
+    async function fetchMembers() {
+      if (!project?.workspaceId || !token) return
+      setMembersLoading(true)
+      setMembersError(null)
+      try {
+        const users = await listWorkspaceMembers({ workspaceId: project.workspaceId, token })
+        setMembers(users)
+      } catch (err: any) {
+        setMembersError(err.message || 'Failed to load members')
+      } finally {
+        setMembersLoading(false)
+      }
+    }
+    fetchMembers()
+  }, [project?.workspaceId, token])
 
   // Fetch comments for a given taskId
   async function fetchAndSetComments(taskId: string) {
@@ -203,7 +227,7 @@ function ProjectDetail() {
             {task.title}
           </span>
           {task.description && <span className="ml-2 text-gray-400">{task.description}</span>}
-          <span className="ml-4 text-xs text-gray-400">{task.status}</span>
+          {/* Status Dropdown */}
           <select
             className="ml-4 px-2 py-1 rounded border text-xs dark:bg-gray-900 dark:text-white dark:border-gray-700"
             value={task.status}
@@ -220,6 +244,42 @@ function ProjectDetail() {
             <option value="in-progress">In Progress</option>
             <option value="done">Done</option>
           </select>
+          {/* Assigned User Display */}
+          {task.assignee && (
+            <span className="ml-4 flex items-center gap-1 text-xs">
+              {task.assignee.avatarUrl && (
+                <img
+                  src={task.assignee.avatarUrl}
+                  alt={task.assignee.name}
+                  className="w-6 h-6 rounded-full object-cover border border-gray-300 dark:border-gray-700"
+                  loading="lazy"
+                />
+              )}
+              <span className="font-medium text-gray-700 dark:text-gray-200">{task.assignee.name}</span>
+            </span>
+          )}
+          {/* Assignment Dropdown */}
+          <select
+            className="ml-4 px-2 py-1 rounded border text-xs dark:bg-gray-900 dark:text-white dark:border-gray-700"
+            value={task.assignee?.id || undefined}
+            onChange={async e => {
+              try {
+                const updated = await updateTask({ id: task.id, token, assigneeId: e.target.value || undefined })
+                onUpdate(updated)
+              } catch (err: any) {
+                setError(err.message || 'Failed to assign user')
+              }
+            }}
+            disabled={membersLoading}
+          >
+            <option value="">Unassigned</option>
+            {members.map(m => (
+              <option key={m.id} value={m.id}>
+                {m.name} {m.email ? `(${m.email})` : ''}
+              </option>
+            ))}
+          </select>
+          {/* End Assignment Dropdown */}
           <button
             type="button"
             className="ml-2 px-2 py-1 rounded bg-yellow-500 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition"

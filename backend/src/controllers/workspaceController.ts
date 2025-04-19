@@ -71,3 +71,17 @@ export async function deleteWorkspace(req: Request, res: Response) {
   console.log('deleteWorkspace: deleted workspace', id)
   res.status(204).send()
 }
+
+// List all users in a workspace
+export async function listWorkspaceMembers(req: Request, res: Response) {
+  const userId = (req as any).userId
+  const { workspaceId } = req.params
+  // Only allow if user is a member of the workspace
+  const isMember = await prisma.workspaceMember.findFirst({ where: { workspaceId, userId } })
+  if (!isMember) return res.status(403).json({ error: 'Not a member of workspace' })
+  const members = await prisma.workspaceMember.findMany({
+    where: { workspaceId },
+    include: { user: { select: { id: true, name: true, avatarUrl: true, email: true } } }
+  })
+  res.json({ members: members.map(m => m.user) })
+}

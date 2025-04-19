@@ -6,6 +6,12 @@ export interface Task {
   priority?: string
   dueDate?: string
   assigneeId?: string
+  assignee?: {
+    id: string
+    name: string
+    email?: string
+    avatarUrl?: string | null
+  }
   projectId: string
   parentTaskId?: string
   subtasks?: Task[]
