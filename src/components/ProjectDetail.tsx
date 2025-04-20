@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { useAuth } from '../store/authContext'
 import { getProject } from '../services/project'
 import { listTasks, createTask, updateTask, deleteTask } from '../services/task'
-import { fetchComments, addComment } from '../services/comment'
+import { fetchComments, addComment, deleteComment } from '../services/comment'
 import { listWorkspaceMembers } from '../services/workspace'
 import { listLabels } from '../services/label'
 import type { Task } from '../types/task'
@@ -126,6 +126,19 @@ function ProjectDetail() {
     } finally {
       setCommentsLoadingTaskId(null)
     }
+  }
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (!token) return
+    await deleteComment({ commentId, token })
+    // Remove the comment from state for all tasks
+    setCommentsByTask(prev => {
+      const updated = { ...prev }
+      for (const tid in updated) {
+        updated[tid] = updated[tid].filter(c => c.id !== commentId)
+      }
+      return updated
+    })
   }
 
   function SubtaskTree({ subtasks, token, onUpdate }: { subtasks?: Task[]; token: string; onUpdate: (t: Task) => void }) {
@@ -578,6 +591,7 @@ function ProjectDetail() {
                     taskId={task.id}
                     comments={commentsByTask[task.id] || []}
                     onAddComment={content => handleAddComment(task.id, content)}
+                    onDeleteComment={handleDeleteComment}
                     isLoading={commentsLoadingTaskId === task.id}
                   />
                   {commentsErrorTaskId[task.id] && <div className="text-red-500 text-sm mt-2">{commentsErrorTaskId[task.id]}</div>}
@@ -605,6 +619,7 @@ function ProjectDetail() {
                       taskId={task.id}
                       comments={commentsByTask[task.id] || []}
                       onAddComment={content => handleAddComment(task.id, content)}
+                      onDeleteComment={handleDeleteComment}
                       isLoading={commentsLoadingTaskId === task.id}
                     />
                     {commentsErrorTaskId[task.id] && <div className="text-red-500 text-sm mt-2">{commentsErrorTaskId[task.id]}</div>}

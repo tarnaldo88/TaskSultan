@@ -57,3 +57,11 @@ export async function addComment({ taskId, content, token }: { taskId: string, c
   if (data && data.comment) return mapCommentWithUser(data.comment)
   throw new Error('Unexpected comment response')
 }
+
+export async function deleteComment({ commentId, token }: { commentId: string, token: string }): Promise<void> {
+  const res = await fetch(`${API_URL}/comments/${commentId}`, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
+  })
+  if (!res.ok) throw new Error('Failed to delete comment')
+}
