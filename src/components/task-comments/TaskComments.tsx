@@ -13,6 +13,8 @@ function TaskComments({ taskId, comments, onAddComment, onDeleteComment, isLoadi
   const [value, setValue] = React.useState('')
   const [submitting, setSubmitting] = React.useState(false)
   const [deletingId, setDeletingId] = React.useState<string | null>(null)
+  const { token, user } = (window as any).authContext || {} // fallback for context
+  // If using context, use: const { user } = useAuth()
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -35,7 +37,7 @@ function TaskComments({ taskId, comments, onAddComment, onDeleteComment, isLoadi
             <div className="flex items-center gap-2 mb-1">
               <span className="font-medium text-sm">{comment.authorName}</span>
               <span className="text-xs text-gray-400">{new Date(comment.createdAt).toLocaleString()}</span>
-              {onDeleteComment && (
+              {onDeleteComment && user?.id === comment.authorId && (
                 <button
                   type="button"
                   className="ml-2 px-2 py-1 rounded bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition absolute right-2 top-2"
