@@ -290,7 +290,7 @@ function ProjectDetail() {
 
     if (editing) {
       return (
-        <li className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-8 mb-6 flex flex-col gap-2 transition-all max-w-3xl mx-auto">
+        <li className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-8 mb-6 flex flex-col gap-2 transition-all max-w-3xl mx-auto w-full box-border">
           <input
             type="text"
             value={title}
@@ -333,17 +333,20 @@ function ProjectDetail() {
     }
 
     return (
-      <li className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-8 mb-6 flex flex-col gap-2 transition-all max-w-3xl mx-auto">
-        <div className="flex items-center gap-4 mb-4">
+      <li
+        className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-8 mb-6 flex flex-col gap-2 transition-all max-w-3xl mx-auto w-full box-border"
+        style={{ width: '100%', boxSizing: 'border-box' }}
+      >
+        <div className="flex flex-wrap items-center gap-4 mb-2 w-full">
           <span className="font-semibold text-lg md:text-xl text-purple-500/90 drop-shadow-sm tracking-tight">
             {task.title}
           </span>
-          {task.labels && task.labels.length > 0 && (
-            <span className="flex flex-wrap gap-1 ml-2">
+          {Array.isArray(task.labels) && task.labels.length > 0 && (
+            <div className="flex flex-wrap gap-1 items-center">
               {task.labels.map(label => (
                 <LabelBadge key={label.id} label={label} />
               ))}
-            </span>
+            </div>
           )}
           <button
             type="button"
@@ -361,11 +364,6 @@ function ProjectDetail() {
                 onChange={handleQuickLabelChange}
                 disabled={saving || labelsLoading}
               />
-            </div>
-          )}
-          {task.description && task.description.trim() && (
-            <div className="text-gray-600 dark:text-gray-300 text-sm ml-1 mb-1 whitespace-pre-line">
-              {task.description}
             </div>
           )}
           {/* Status Dropdown */}
@@ -453,6 +451,11 @@ function ProjectDetail() {
             Edit
           </button>
         </div>
+        {task.description && (
+          <div className="text-gray-700 dark:text-gray-300 text-sm mb-2 whitespace-pre-line">
+            {task.description}
+          </div>
+        )}
         {isAddingSubtask && (
           <form
             className="flex flex-col gap-1 mt-2 ml-6"
