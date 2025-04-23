@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
+import path from 'path'
 import authRoutes from './routes/authRoutes'
 import userRoutes from './routes/userRoutes'
 import workspaceRoutes from './routes/workspaceRoutes'
@@ -17,6 +18,9 @@ const port = process.env.PORT || 4000
 
 app.use(cors())
 app.use(express.json())
+
+// Serve uploaded avatars and other static files
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')))
 
 app.get('/api/health', (req, res) => res.json({ status: 'ok', message: 'TaskSultan backend running' }))
 

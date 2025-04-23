@@ -215,13 +215,59 @@ function Projects() {
 }
 
 function Profile() {
-  const { user } = useAuth()
+  const { user, token, fetchMe } = useAuth()
+  const [avatarUrl, setAvatarUrl] = React.useState(user?.avatarUrl || '')
+  const [uploading, setUploading] = React.useState(false)
+  const [error, setError] = React.useState<string | null>(null)
+
+  async function handleAvatarChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setError(null)
+    const file = e.target.files?.[0]
+    if (!file || !token) return
+    setUploading(true)
+    try {
+      const { url, success, error: uploadErr } = await import('./services/avatar').then(m => m.uploadAvatar({ file, token }))
+      if (!success) {
+        setError(uploadErr || 'Upload failed')
+        return
+      }
+      setAvatarUrl(url)
+      await fetchMe() // Refresh user info
+    } catch (err: any) {
+      setError(err.message || 'Upload failed')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white">
       <NavBar />
       <div className="flex flex-col items-center justify-center flex-1">
         <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-md mt-8">
           <h1 className="text-2xl font-bold mb-4">Profile</h1>
+          <div className="flex flex-col items-center mb-4">
+            <img
+              src={avatarUrl ? (avatarUrl.startsWith('http') ? avatarUrl : `http://localhost:4000${avatarUrl}`) : '/img/default-avatar.webp'}
+              alt="User Avatar"
+              className="w-24 h-24 rounded-full object-cover border-2 border-purple-400 shadow mb-2 bg-white"
+              loading="lazy"
+              width={96}
+              height={96}
+            />
+            <label className="block">
+              <span className="sr-only">Choose avatar</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                onChange={handleAvatarChange}
+                disabled={uploading}
+              />
+            </label>
+            {uploading && <div className="text-purple-500 text-sm mt-2">Uploading...</div>}
+            {error && <div className="text-red-500 text-sm mt-2">{error}</div>}
+          </div>
           <p className="mb-4">Email: <span className="font-semibold">{user?.email}</span></p>
           <p>Name: <span className="font-semibold">{user?.name}</span></p>
         </div>
