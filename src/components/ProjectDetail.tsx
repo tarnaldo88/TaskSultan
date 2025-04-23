@@ -45,6 +45,13 @@ function ProjectDetail() {
   const [labelsLoading, setLabelsLoading] = React.useState(false)
   const [labelsError, setLabelsError] = React.useState<string | null>(null)
 
+  // --- Project editing state ---
+  const [editingProject, setEditingProject] = React.useState(false)
+  const [projectName, setProjectName] = React.useState('')
+  const [projectDesc, setProjectDesc] = React.useState('')
+  const [projectSaveLoading, setProjectSaveLoading] = React.useState(false)
+  const [projectSaveError, setProjectSaveError] = React.useState<string | null>(null)
+
   React.useEffect(() => {
     if (!projectId || !token) return
     setLoading(true)
@@ -91,6 +98,13 @@ function ProjectDetail() {
       .catch(e => setLabelsError(e.message))
       .finally(() => setLabelsLoading(false))
   }, [project?.workspaceId, token])
+
+  React.useEffect(() => {
+    if (project) {
+      setProjectName(project.name)
+      setProjectDesc(project.description || '')
+    }
+  }, [project])
 
   // Fetch comments for a given taskId
   async function fetchAndSetComments(taskId: string) {
@@ -139,6 +153,30 @@ function ProjectDetail() {
       }
       return updated
     })
+  }
+
+  async function handleProjectSave() {
+    if (!projectId || !token) return
+    setProjectSaveLoading(true)
+    setProjectSaveError(null)
+    try {
+      const res = await fetch(`http://localhost:4000/api/projects/${projectId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ name: projectName.trim(), description: projectDesc.trim() })
+      })
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed to update project')
+      const data = await res.json()
+      setProject(data.project)
+      setEditingProject(false)
+    } catch (err: any) {
+      setProjectSaveError(err.message || 'Failed to update project')
+    } finally {
+      setProjectSaveLoading(false)
+    }
   }
 
   function SubtaskTree({ subtasks, token, onUpdate }: { subtasks?: Task[]; token: string; onUpdate: (t: Task) => void }) {
@@ -528,7 +566,59 @@ function ProjectDetail() {
         </div>
       </nav>
       <div className="max-w-4xl mx-auto px-4 py-12">
-        
+        {/* Project Info UI */}
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 mb-8 border border-purple-200 dark:border-purple-700">
+          <div className="flex items-center gap-4 mb-4">
+            <h1 className="text-3xl font-bold text-purple-700 tracking-tight drop-shadow-lg flex-1">
+              {editingProject ? (
+                <input
+                  type="text"
+                  className="px-2 py-1 rounded border text-lg font-bold dark:bg-gray-900 dark:text-white dark:border-gray-700 w-64"
+                  value={projectName}
+                  onChange={e => setProjectName(e.target.value)}
+                  disabled={projectSaveLoading}
+                />
+              ) : (
+                project?.name || 'Project'
+              )}
+            </h1>
+            <button
+              type="button"
+              className="ml-4 px-3 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
+              onClick={() => setEditingProject(e => !e)}
+              disabled={projectSaveLoading}
+            >
+              {editingProject ? 'Cancel' : 'Edit'}
+            </button>
+            {editingProject && (
+              <button
+                type="button"
+                className="ml-2 px-3 py-2 rounded bg-green-600 hover:bg-green-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-green-900/30 transition-all"
+                onClick={handleProjectSave}
+                disabled={projectSaveLoading || !projectName.trim()}
+              >
+                {projectSaveLoading ? 'Saving...' : 'Save'}
+              </button>
+            )}
+          </div>
+          <div className="mb-2">
+            <span className="font-semibold text-gray-700 dark:text-gray-300">Description:</span>
+            {editingProject ? (
+              <textarea
+                className="block w-full mt-2 px-2 py-1 rounded border text-base dark:bg-gray-900 dark:text-white dark:border-gray-700"
+                rows={2}
+                value={projectDesc}
+                onChange={e => setProjectDesc(e.target.value)}
+                disabled={projectSaveLoading}
+              />
+            ) : (
+              <div className="mt-2 text-gray-800 dark:text-gray-200 whitespace-pre-line min-h-[2em]">
+                {project?.description || <span className="italic text-gray-400">No description</span>}
+              </div>
+            )}
+            {projectSaveError && <div className="text-red-500 text-sm mt-2">{projectSaveError}</div>}
+          </div>
+        </div>
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 mb-12 border border-purple-200 dark:border-purple-700">
           <h2 className="text-xl font-semibold mb-2">Tasks</h2>
           {project?.workspaceId && token && (

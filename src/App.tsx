@@ -148,6 +148,26 @@ function Projects() {
           <div className="flex items-center gap-3 mb-4">
             <h1 className="text-2xl font-bold">Projects</h1>
           </div>
+          <div className="mb-2 font-semibold">Projects in Workspace:</div>
+          {loading ? (
+            <div className="text-gray-500">Loading...</div>
+          ) : (
+            <ul className="space-y-1 mb-4">
+              {projects.length === 0 && <li className="text-sm text-gray-500">No projects found.</li>}
+              {projects.map(prj => (
+                <li key={prj.id} className="mb-2">
+                  <Link
+                    to={`/projects/${prj.id}`}
+                    className="font-bold text-2xl md:text-3xl text-purple-600 hover:underline drop-shadow-sm tracking-tight"
+                  >
+                    {prj.name}
+                  </Link>
+                  {prj.description && <span className="ml-3 text-base text-gray-400 align-middle">{prj.description}</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+          <hr className="my-4 border-t border-gray-300 dark:border-gray-700" />
           <form className="flex flex-col gap-2 mb-4" onSubmit={handleCreateProject}>
             <input
               type="text"
@@ -173,27 +193,7 @@ function Projects() {
               {creating ? 'Creating...' : 'Create Project'}
             </button>
           </form>
-          <hr className="my-4 border-t border-gray-300 dark:border-gray-700" />
           {error && <div className="text-red-500 text-sm mb-2">{error}</div>}
-          <div className="mb-2 font-semibold">Projects in Workspace:</div>
-          {loading ? (
-            <div className="text-gray-500">Loading...</div>
-          ) : (
-            <ul className="space-y-1 mb-4">
-              {projects.length === 0 && <li className="text-sm text-gray-500">No projects found.</li>}
-              {projects.map(prj => (
-                <li key={prj.id} className="text-sm">
-                  <Link
-                    to={`/projects/${prj.id}`}
-                    className="font-semibold text-primary hover:underline"
-                  >
-                    {prj.name}
-                  </Link>
-                  {prj.description && <span className="ml-2 text-gray-400">{prj.description}</span>}
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
       </div>
     </div>
