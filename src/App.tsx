@@ -86,7 +86,16 @@ function Dashboard() {
           <ul className="space-y-1 mb-4">
             {workspaces.length === 0 && <li className="text-sm text-gray-500">No workspaces found.</li>}
             {workspaces.map(ws => (
-              <li key={ws.id} className="text-sm">{ws.name}</li>
+              <li key={ws.id} className={`text-sm cursor-pointer rounded px-2 py-1 transition-colors ${ws.id === activeWorkspaceId ? 'bg-purple-100 dark:bg-purple-900/40 font-bold text-purple-700 dark:text-purple-300' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
+                onClick={() => setActiveWorkspaceId(ws.id)}
+                aria-current={ws.id === activeWorkspaceId ? 'true' : undefined}
+                tabIndex={0}
+                onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setActiveWorkspaceId(ws.id) }}
+                role="button"
+              >
+                {ws.name}
+                {ws.id === activeWorkspaceId && <span className="ml-2 text-xs text-purple-500">(Current)</span>}
+              </li>
             ))}
           </ul>
           <button className="px-4 py-2 rounded bg-primary text-white" onClick={logout}>Logout</button>
