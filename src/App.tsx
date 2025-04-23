@@ -277,13 +277,9 @@ function Profile() {
 }
 
 function NavBar() {
-  const { user, logout } = useAuth()
-  const { workspaces, activeWorkspaceId, setActiveWorkspaceId } = useWorkspace()
-  if (!user) return null
-
-  function handleWorkspaceSelect(e: React.ChangeEvent<HTMLSelectElement>) {
-    setActiveWorkspaceId(e.target.value)
-  }
+  const { user } = useAuth()
+  // Ensure avatar URL is always absolute for display
+  const avatarUrl = user?.avatarUrl ? (user.avatarUrl.startsWith('http') ? user.avatarUrl : `http://localhost:4000${user.avatarUrl}`) : '/img/default-avatar.webp'
 
   return (
     <nav className="w-full flex items-center justify-between px-8 py-4 bg-card shadow">
@@ -296,25 +292,19 @@ function NavBar() {
           className="h-9 w-9 object-contain drop-shadow order-1"
           draggable="false"
         />
-        <span className="text-lg font-bold text-primary order-2">Task Sultan</span>
-        {workspaces.length > 0 && (
-          <select
-            className="ml-4 px-2 py-1 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700 text-sm"
-            value={activeWorkspaceId || ''}
-            onChange={handleWorkspaceSelect}
-            style={{ minWidth: 140 }}
-          >
-            {workspaces.map(ws => (
-              <option key={ws.id} value={ws.id}>{ws.name}</option>
-            ))}
-          </select>
-        )}
+        {/* Avatar to the left of Dashboard link */}
+        <img
+          src={avatarUrl}
+          alt="Profile"
+          className="h-8 w-8 rounded-full object-cover border-2 border-purple-400 shadow order-2 bg-white"
+          style={{ marginLeft: 8, marginRight: 4 }}
+        />
+        <Link to="/dashboard" className="text-primary order-3">Dashboard</Link>
+        <Link to="/projects" className="text-primary order-4">Projects</Link>
+        <Link to="/profile" className="text-primary order-5">Profile</Link>
       </div>
       <div className="flex gap-4 items-center">
-        <Link to="/dashboard" className="text-primary">Dashboard</Link>
-        <Link to="/projects" className="text-primary">Projects</Link>
-        <Link to="/profile" className="text-primary">Profile</Link>
-        <button className="ml-4 px-3 py-1 rounded bg-primary text-white" onClick={logout}>Logout</button>
+        <button className="ml-4 px-3 py-1 rounded bg-primary text-white" onClick={useAuth().logout}>Logout</button>
       </div>
     </nav>
   )
