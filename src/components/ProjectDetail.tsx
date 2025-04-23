@@ -179,6 +179,20 @@ function ProjectDetail() {
     }
   }
 
+  async function handleDeleteTask(taskId: string) {
+    if (!taskId || !token) {
+      setTaskError('Task ID and authentication required.')
+      return
+    }
+    setTaskError(null)
+    try {
+      await deleteTask({ id: taskId, token })
+      setTasks(ts => ts.filter(t => t.id !== taskId))
+    } catch (err: any) {
+      setTaskError(err.message || 'Failed to delete task')
+    }
+  }
+
   function SubtaskTree({ subtasks, token, onUpdate }: { subtasks?: Task[]; token: string; onUpdate: (t: Task) => void }) {
     if (!subtasks || subtasks.length === 0) return null
     return (
@@ -410,28 +424,7 @@ function ProjectDetail() {
           <button
             type="button"
             className="ml-2 px-2 py-1 rounded bg-red-600 text-white text-xs font-semibold hover:bg-red-700 transition"
-            onClick={async () => {
-              if (!window.confirm('Are you sure you want to delete this task?')) return
-              setSaving(true)
-              setError(null)
-              try {
-                await deleteTask({ id: task.id, token })
-                // Reload all tasks after deletion
-                if (projectId && token) {
-                  setTaskLoading(true)
-                  try {
-                    const updatedTasks = await listTasks({ projectId, token })
-                    setTasks(updatedTasks)
-                  } finally {
-                    setTaskLoading(false)
-                  }
-                }
-              } catch (err: any) {
-                setError(err.message || 'Failed to delete task')
-              } finally {
-                setSaving(false)
-              }
-            }}
+            onClick={() => handleDeleteTask(task.id)}
             disabled={saving}
           >
             Delete

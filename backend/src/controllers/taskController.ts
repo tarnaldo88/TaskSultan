@@ -150,6 +150,18 @@ export async function updateTask(req: Request, res: Response) {
   res.json({ task: updated })
 }
 
+async function deleteTaskDeep(taskId: string) {
+  // Delete all comments for this task
+  await prisma.comment.deleteMany({ where: { taskId } })
+  // Find and recursively delete all subtasks
+  const subtasks = await prisma.task.findMany({ where: { parentTaskId: taskId } })
+  for (const subtask of subtasks) {
+    await deleteTaskDeep(subtask.id)
+  }
+  // Delete the task itself
+  await prisma.task.delete({ where: { id: taskId } })
+}
+
 export async function deleteTask(req: Request, res: Response) {
   const userId = (req as any).userId
   const { id } = req.params
@@ -161,6 +173,10 @@ export async function deleteTask(req: Request, res: Response) {
   if (!project) return res.status(404).json({ error: 'Project not found' })
   const isMember = await prisma.workspaceMember.findFirst({ where: { workspaceId: project.workspaceId, userId } })
   if (!isMember) return res.status(403).json({ error: 'Not a member of workspace' })
-  await prisma.task.delete({ where: { id } })
-  res.status(204).send()
+  try {
+    await deleteTaskDeep(id)
+    return res.status(204).send()
+  } catch (e: any) {
+    return res.status(500).json({ error: e.message || 'Failed to delete task and dependencies' })
+  }
 }
