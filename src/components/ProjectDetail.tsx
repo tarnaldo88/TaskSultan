@@ -582,9 +582,16 @@ function ProjectDetail() {
                 project?.name || 'Project'
               )}
             </h1>
+          </div>
+          {project?.description && !editingProject && (
+            <div className="text-gray-700 dark:text-gray-300 text-base mb-4 whitespace-pre-line">
+              {project.description}
+            </div>
+          )}
+          <div className="flex items-center gap-2 mb-4">
             <button
               type="button"
-              className="ml-4 px-3 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
+              className="px-3 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
               onClick={() => setEditingProject(e => !e)}
               disabled={projectSaveLoading}
             >
@@ -601,23 +608,16 @@ function ProjectDetail() {
               </button>
             )}
           </div>
-          <div className="mb-2">
-            <span className="font-semibold text-gray-700 dark:text-gray-300">Description:</span>
-            {editingProject ? (
-              <textarea
-                className="block w-full mt-2 px-2 py-1 rounded border text-base dark:bg-gray-900 dark:text-white dark:border-gray-700"
-                rows={2}
-                value={projectDesc}
-                onChange={e => setProjectDesc(e.target.value)}
-                disabled={projectSaveLoading}
-              />
-            ) : (
-              <div className="mt-2 text-gray-800 dark:text-gray-200 whitespace-pre-line min-h-[2em]">
-                {project?.description || <span className="italic text-gray-400">No description</span>}
-              </div>
-            )}
-            {projectSaveError && <div className="text-red-500 text-sm mt-2">{projectSaveError}</div>}
-          </div>
+          {editingProject && (
+            <textarea
+              className="block w-full mt-2 px-2 py-1 rounded border text-base dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              rows={2}
+              value={projectDesc}
+              onChange={e => setProjectDesc(e.target.value)}
+              disabled={projectSaveLoading}
+            />
+          )}
+          {projectSaveError && <div className="text-red-500 text-sm mt-2">{projectSaveError}</div>}
         </div>
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 mb-12 border border-purple-200 dark:border-purple-700">
           <h2 className="text-xl font-semibold mb-2">Tasks</h2>
