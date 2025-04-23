@@ -164,14 +164,18 @@ function Projects() {
             <ul className="space-y-1 mb-4">
               {projects.length === 0 && <li className="text-sm text-gray-500">No projects found.</li>}
               {projects.map(prj => (
-                <li key={prj.id} className="mb-2">
+                <li key={prj.id} className="mb-4">
                   <Link
                     to={`/projects/${prj.id}`}
                     className="font-bold text-2xl md:text-3xl text-purple-600 hover:underline drop-shadow-sm tracking-tight"
                   >
                     {prj.name}
                   </Link>
-                  {prj.description && <span className="ml-3 text-base text-gray-400 align-middle">{prj.description}</span>}
+                  {prj.description && (
+                    <div className="text-gray-700 dark:text-gray-300 text-base mt-1 ml-1 whitespace-pre-line">
+                      {prj.description}
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
