@@ -168,6 +168,7 @@ function Projects() {
             </ul>
           )}
           <hr className="my-4 border-t border-gray-300 dark:border-gray-700" />
+          <div className="mb-2 font-semibold text-xl text-white">Create Project</div>
           <form className="flex flex-col gap-2 mb-4" onSubmit={handleCreateProject}>
             <input
               type="text"
