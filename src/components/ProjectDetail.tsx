@@ -284,12 +284,12 @@ function ProjectDetail() {
             className="px-2 py-1 rounded border text-sm dark:bg-gray-900 dark:text-white dark:border-gray-700 w-32"
             disabled={saving}
           />
-          <input
-            type="text"
+          <textarea
             value={description}
             onChange={e => setDescription(e.target.value)}
-            className="px-2 py-1 rounded border text-sm dark:bg-gray-900 dark:text-white dark:border-gray-700 w-48"
+            className="px-2 py-1 rounded border text-sm dark:bg-gray-900 dark:text-white dark:border-gray-700 w-full min-h-[80px] resize-y"
             disabled={saving}
+            placeholder="Description (optional)"
           />
           <LabelSelect
             labels={labels}
@@ -320,7 +320,7 @@ function ProjectDetail() {
 
     return (
       <li className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-8 mb-6 flex flex-col gap-2 transition-all max-w-3xl mx-auto">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-4 mb-4">
           <span className="font-semibold text-lg md:text-xl text-purple-500/90 drop-shadow-sm tracking-tight">
             {task.title}
           </span>
@@ -349,7 +349,11 @@ function ProjectDetail() {
               />
             </div>
           )}
-          {task.description && <span className="ml-2 text-gray-400">{task.description}</span>}
+          {task.description && task.description.trim() && (
+            <div className="text-gray-600 dark:text-gray-300 text-sm ml-1 mb-1 whitespace-pre-line">
+              {task.description}
+            </div>
+          )}
           {/* Status Dropdown */}
           <select
             className="ml-4 px-2 py-1 rounded border text-xs dark:bg-gray-900 dark:text-white dark:border-gray-700"
