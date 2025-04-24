@@ -52,6 +52,16 @@ function ProjectDetail() {
   const [projectSaveLoading, setProjectSaveLoading] = React.useState(false)
   const [projectSaveError, setProjectSaveError] = React.useState<string | null>(null)
 
+  const handleLabelCreated = React.useCallback(() => {
+    if (!project?.workspaceId || !token) return
+    setLabelsLoading(true)
+    setLabelsError(null)
+    listLabels({ workspaceId: project.workspaceId, token })
+      .then(setLabels)
+      .catch(e => setLabelsError(e.message))
+      .finally(() => setLabelsLoading(false))
+  }, [project?.workspaceId, token])
+
   React.useEffect(() => {
     if (!projectId || !token) return
     setLoading(true)
@@ -337,7 +347,7 @@ function ProjectDetail() {
         className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-8 mb-6 flex flex-col gap-2 transition-all max-w-3xl mx-auto w-full box-border"
         style={{ width: '100%', boxSizing: 'border-box' }}
       >
-        <div className="flex flex-wrap items-center gap-4 mb-2 w-full">
+        <div className="flex items-center gap-4 mb-2 w-full">
           <span className="font-semibold text-lg md:text-xl text-purple-500/90 drop-shadow-sm tracking-tight">
             {task.title}
           </span>
@@ -622,7 +632,11 @@ function ProjectDetail() {
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 mb-12 border border-purple-200 dark:border-purple-700">
           <h2 className="text-xl font-semibold mb-2">Tasks</h2>
           {project?.workspaceId && token && (
-            <LabelManager workspaceId={project.workspaceId} token={token} />
+            <LabelManager
+              workspaceId={project.workspaceId}
+              token={token}
+              onLabelCreated={handleLabelCreated}
+            />
           )}
           <form onSubmit={handleCreateTask} className="flex flex-col gap-2 mb-8">
             <input

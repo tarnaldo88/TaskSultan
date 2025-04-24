@@ -5,9 +5,10 @@ import { listLabels } from '../services/label'
 interface LabelManagerProps {
   workspaceId: string
   token: string
+  onLabelCreated?: () => void
 }
 
-export function LabelManager({ workspaceId, token }: LabelManagerProps) {
+export function LabelManager({ workspaceId, token, onLabelCreated }: LabelManagerProps) {
   const [labels, setLabels] = React.useState<Label[]>([])
   const [loading, setLoading] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
@@ -47,6 +48,7 @@ export function LabelManager({ workspaceId, token }: LabelManagerProps) {
       setName('')
       setColor('#6d28d9')
       fetchLabels()
+      if (onLabelCreated) onLabelCreated()
     } catch (e: any) {
       setError(e.message)
     } finally {
