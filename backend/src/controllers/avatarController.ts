@@ -1,11 +1,10 @@
 import type { Request, Response } from 'express'
-import type { Multer } from 'multer'
 import { prisma } from '../prisma/client'
 import path from 'path'
 
 // Extend Request type to include file
 interface MulterRequest extends Request {
-  file: Multer.File
+  file: Express.Multer.File
 }
 
 export async function uploadAvatarHandler(req: MulterRequest, res: Response) {

@@ -343,7 +343,7 @@ function ProjectDetail() {
     }
 
     return (
-      <li
+      <div
         className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-8 mb-6 flex flex-col gap-2 transition-all max-w-3xl mx-auto w-full box-border"
         style={{ width: '100%', boxSizing: 'border-box' }}
       >
@@ -360,7 +360,7 @@ function ProjectDetail() {
           )}
           <button
             type="button"
-            className="ml-1 px-1 py-0.5 rounded bg-purple-200 hover:bg-purple-400 text-purple-900 text-xs font-bold"
+            className="ml-1 px-2 py-1 rounded bg-purple-200 hover:bg-purple-400 text-purple-900 text-xs font-bold"
             title="Quick add/remove labels"
             onClick={() => setShowLabelSelect(v => !v)}
           >
@@ -516,7 +516,7 @@ function ProjectDetail() {
         )}
         <SubtaskTree subtasks={task.subtasks} token={token} onUpdate={handleSubtaskUpdate} />
         {error && <span className="text-xs text-red-500 ml-2">{error}</span>}
-      </li>
+      </div>
     )
   }
 
@@ -601,7 +601,7 @@ function ProjectDetail() {
           <div className="flex items-center gap-2 mb-4">
             <button
               type="button"
-              className="px-3 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
+              className="px-2 py-1 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow transition-all"
               onClick={() => setEditingProject(e => !e)}
               disabled={projectSaveLoading}
             >
@@ -610,7 +610,7 @@ function ProjectDetail() {
             {editingProject && (
               <button
                 type="button"
-                className="ml-2 px-3 py-2 rounded bg-green-600 hover:bg-green-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-green-900/30 transition-all"
+                className="ml-2 px-2 py-1 rounded bg-green-600 hover:bg-green-700 text-white font-semibold disabled:opacity-50 shadow transition-all"
                 onClick={handleProjectSave}
                 disabled={projectSaveLoading || !projectName.trim()}
               >
@@ -644,7 +644,7 @@ function ProjectDetail() {
               value={newTaskTitle}
               onChange={e => setNewTaskTitle(e.target.value)}
               placeholder="Task title"
-              className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              className="px-2 py-1 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
               disabled={creatingTask}
             />
             <input
@@ -652,7 +652,7 @@ function ProjectDetail() {
               value={newTaskDesc}
               onChange={e => setNewTaskDesc(e.target.value)}
               placeholder="Description (optional)"
-              className="px-3 py-2 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              className="px-2 py-1 rounded border dark:bg-gray-900 dark:text-white dark:border-gray-700"
               disabled={creatingTask}
             />
             <LabelSelect
@@ -663,7 +663,7 @@ function ProjectDetail() {
             />
             <button
               type="submit"
-              className="px-4 py-2 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow-lg shadow-purple-900/30 transition-all"
+              className="px-2 py-1 rounded bg-purple-600 hover:bg-purple-700 text-white font-semibold disabled:opacity-50 shadow transition-all"
               disabled={creatingTask || !newTaskTitle.trim()}
             >
               {creatingTask ? 'Creating...' : 'Add Task'}
