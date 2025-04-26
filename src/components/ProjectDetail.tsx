@@ -347,10 +347,12 @@ function ProjectDetail() {
         className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-8 mb-6 flex flex-col gap-2 transition-all max-w-3xl mx-auto w-full box-border"
         style={{ width: '100%', boxSizing: 'border-box' }}
       >
+        {/* Task Title on top */}
+        <div className="font-semibold text-lg md:text-xl text-purple-500/90 drop-shadow-sm tracking-tight mb-1">
+          {task.title}
+        </div>
+        {/* Row with labels and controls */}
         <div className="flex items-center gap-4 mb-2 w-full">
-          <span className="font-semibold text-lg md:text-xl text-purple-500/90 drop-shadow-sm tracking-tight">
-            {task.title}
-          </span>
           {Array.isArray(task.labels) && task.labels.length > 0 && (
             <div className="flex flex-wrap gap-1 items-center">
               {task.labels.map(label => (
@@ -401,7 +403,6 @@ function ProjectDetail() {
                   src={task.assignee.avatarUrl}
                   alt={task.assignee.name}
                   className="w-6 h-6 rounded-full object-cover border border-gray-300 dark:border-gray-700"
-                  loading="lazy"
                 />
               )}
               <span className="font-medium text-gray-700 dark:text-gray-200">{task.assignee.name}</span>
@@ -447,7 +448,7 @@ function ProjectDetail() {
           </button>
           <button
             type="button"
-            className="ml-2 px-2 py-1 rounded bg-purple-500 text-white text-xs font-semibold hover:bg-green-600 transition"
+            className="ml-2 px-1 py-1 rounded bg-purple-500 text-white text-xs font-semibold hover:bg-green-600 transition"
             onClick={() => setSubtaskParentId(task.id)}
           >
             + Subtask
