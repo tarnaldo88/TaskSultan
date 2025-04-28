@@ -48,7 +48,6 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white">
-      <NavBar />
       <div className="flex flex-col items-center justify-center flex-1">
         <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-md mt-8">
           {/* Dashboard header with logo and title */}
@@ -151,7 +150,6 @@ function Projects() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white">
-      <NavBar />
       <div className="flex flex-col items-center justify-center flex-1">
         <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-xl mt-8">
           <div className="flex items-center gap-3 mb-4">
@@ -242,7 +240,6 @@ function Profile() {
 
   return (
     <div className="min-h-screen flex flex-col bg-white text-black dark:bg-gray-900 dark:text-white">
-      <NavBar />
       <div className="flex flex-col items-center justify-center flex-1">
         <div className="bg-white dark:bg-gray-800 rounded shadow p-8 w-full max-w-md mt-8">
           <h1 className="text-2xl font-bold mb-4">Profile</h1>
@@ -361,6 +358,7 @@ function App() {
       <DarkModeToggle />
       <WorkspaceProvider>
         <BrowserRouter>
+          <NavBar />
           <Routes>
             <Route path="/login" element={<AuthFormWithRedirect />} />
             <Route
