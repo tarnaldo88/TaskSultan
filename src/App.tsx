@@ -279,7 +279,7 @@ function NavBar() {
   const avatarUrl = user?.avatarUrl ? (user.avatarUrl.startsWith('http') ? user.avatarUrl : `http://localhost:4000${user.avatarUrl}`) : '/img/default-avatar.webp'
 
   return (
-    <nav className="w-full flex items-center justify-between px-8 py-4 bg-card shadow">
+    <nav className="w-full flex items-center justify-between px-8 py-4 bg-card bg dark:bg-gray-800 dark:text-white shadow">
       <div className="flex items-center gap-4">
         <img
           src="/img/LogoSultan.png"

@@ -548,37 +548,10 @@ function ProjectDetail() {
 
   return (
     <div className="min-h-screen bg-white text-black dark:bg-gray-900 dark:text-white">
-      <nav className="w-full flex items-center justify-between px-8 py-4 bg-card shadow">
-        <div className="flex items-center gap-4">
-          <img
-            src="/img/LogoSultan.png"
-            alt="TaskSultan Logo"
-            width={40}
-            height={40}
-            className="h-[40px] w-[40px] object-contain drop-shadow"
-            draggable="false"
-          />
-          <a href="/dashboard" className="font-bold text-lg text-primary">TaskSultan</a>
-        </div>
-        <div className="flex gap-4 items-center">
-          <a href="/dashboard" className="text-primary">Dashboard</a>
-          <a href="/projects" className="text-primary" onClick={e => {
-            if (!token) {
-              e.preventDefault()
-              alert('You must be signed in to view projects.')
-            }
-          }}>Projects</a>
-          <a href="/profile" className="text-primary" onClick={e => {
-            if (!token) {
-              e.preventDefault()
-              alert('You must be signed in to view your profile.')
-            }
-          }}>Profile</a>
-        </div>
-      </nav>
+      
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Project Info UI */}
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 mb-8 border border-purple-200 dark:border-purple-700">
+        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-lg p-8 mb-8 ">
           <div className="flex items-center gap-4 mb-4">
             <h1 className="text-3xl font-bold text-purple-700 tracking-tight drop-shadow-lg flex-1">
               {editingProject ? (
