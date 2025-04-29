@@ -15,6 +15,7 @@ function Dashboard() {
   const [creating, setCreating] = React.useState(false)
   const [newWorkspace, setNewWorkspace] = React.useState('')
   const [error, setError] = React.useState<string | null>(null)
+  const navigate = useNavigate()
 
   async function handleCreateWorkspace(e: React.FormEvent) {
     e.preventDefault()
@@ -86,7 +87,10 @@ function Dashboard() {
             {workspaces.length === 0 && <li className="text-sm text-gray-500">No workspaces found.</li>}
             {workspaces.map(ws => (
               <li key={ws.id} className={`text-sm cursor-pointer rounded px-2 py-1 transition-colors ${ws.id === activeWorkspaceId ? 'bg-purple-100 dark:bg-purple-900/40 font-bold text-purple-700 dark:text-purple-300' : 'hover:bg-gray-100 dark:hover:bg-gray-800'}`}
-                onClick={() => setActiveWorkspaceId(ws.id)}
+                onClick={() => {
+                  setActiveWorkspaceId(ws.id);
+                  navigate('/projects')
+                }}
                 aria-current={ws.id === activeWorkspaceId ? 'true' : undefined}
                 tabIndex={0}
                 onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') setActiveWorkspaceId(ws.id) }}
