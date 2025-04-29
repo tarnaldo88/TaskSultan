@@ -345,7 +345,7 @@ function ProjectDetail() {
     return (
       <div
         className="text-sm border border-purple-200 dark:border-purple-700 bg-white dark:bg-gray-900 rounded-xl shadow-sm py-4 px-8 mb-6 flex flex-col gap-2 transition-all max-w-3xl mx-auto w-full box-border"
-        style={{ width: '100%', boxSizing: 'border-box' }}
+        style={{ width: '100%', boxSizing: 'content-box' }}
       >
         {/* Task Title on top */}
         <div className="font-semibold text-lg md:text-xl text-purple-500/90 drop-shadow-sm tracking-tight mb-1">
@@ -673,6 +673,8 @@ function ProjectDetail() {
                     isLoading={commentsLoadingTaskId === task.id}
                   />
                   {commentsErrorTaskId[task.id] && <div className="text-red-500 text-sm mt-2">{commentsErrorTaskId[task.id]}</div>}
+                  {/* Add 40px space below comments and before next task */}
+                  <div style={{ height: 40 }} />
                 </div>
               ))}
             </ul>
@@ -701,6 +703,8 @@ function ProjectDetail() {
                       isLoading={commentsLoadingTaskId === task.id}
                     />
                     {commentsErrorTaskId[task.id] && <div className="text-red-500 text-sm mt-2">{commentsErrorTaskId[task.id]}</div>}
+                    {/* Add 10px space below comments and before next task */}
+                    <div style={{ height: 10 }} />
                   </div>
                 ))}
               </ul>
