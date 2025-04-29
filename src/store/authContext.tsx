@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react'
 import type { User } from '../types/user'
 import * as authService from '../services/auth'
 
@@ -18,13 +18,26 @@ const AuthContext = createContext<AuthContextProps | undefined>(undefined)
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
     const storedUser = localStorage.getItem('user')
-    return storedUser ? JSON.parse(storedUser) : null
+    if (storedUser) return JSON.parse(storedUser)
+    // If not in localStorage but token exists, fetch from backend
+    const storedToken = localStorage.getItem('token')
+    if (storedToken) {
+      // This will be handled in useEffect below
+      return null
+    }
+    return null
   })
   const [token, setToken] = useState<string | null>(() => {
     return localStorage.getItem('token') || null
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Fetch user from backend if token exists but no user in localStorage
+  useEffect(() => {
+    if (token && !user) fetchMe()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token])
 
   const login = useCallback(async ({ email, password }: { email: string; password: string }) => {
     setIsLoading(true)
