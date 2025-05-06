@@ -48,6 +48,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(user)
       localStorage.setItem('token', token)
       localStorage.setItem('user', JSON.stringify(user))
+      // Immediately fetch the latest user info (avatarUrl) from backend
+      try {
+        const freshUser = await authService.fetchMe(token)
+        setUser(freshUser)
+        localStorage.setItem('user', JSON.stringify(freshUser))
+      } catch (fetchErr) {
+        // fallback: keep using user from login response
+      }
     } catch (err: any) {
       setError(err.message)
     } finally {
