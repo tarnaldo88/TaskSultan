@@ -2,7 +2,7 @@
 
 ## Product Overview
 
-**Product Name:** (TBD)  
+**Product Name:** Task Sultan  
 **Category:** SaaS Task Management Platform  
 **Description:**  
 A collaborative web-based application for teams and individuals to create, assign, and track tasks through customizable workflows, inspired by Jira but focused on simplicity and modern UX.
