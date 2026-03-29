@@ -1,6 +1,6 @@
 # TaskSultan
 
-A modern SaaS task management app inspired by Jira. Built with ReactJS for the frontend. See PRD.md for full product requirements.
+A modern SaaS task management app inspired by Jira. Built with ReactJS for the frontend. See PRD.md for full product requirements. More readme being added in future
 
 ## Getting Started
 
