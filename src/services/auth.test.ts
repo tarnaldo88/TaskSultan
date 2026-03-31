@@ -26,7 +26,7 @@ describe('Auth Service', () => {
     it('should successfully login with valid credentials', async () => {
       const mockResponse: AuthResponse = {
         token: 'test-token',
-        user: { id: '1', email: 'test@example.com', name: 'Test User', role: 'Member' }
+        user: mockUser
       }
       
       mockFetch.mockResolvedValueOnce({
@@ -69,7 +69,7 @@ describe('Auth Service', () => {
     it('should successfully register with valid data', async () => {
       const mockResponse: AuthResponse = {
         token: 'test-token',
-        user: { id: '1', email: 'test@example.com', name: 'Test User', role: 'Member' }
+        user: mockUser
       }
       
       mockFetch.mockResolvedValueOnce({
