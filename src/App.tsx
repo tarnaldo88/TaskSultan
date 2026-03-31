@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useNavigate, Link } from 'react
 import { AuthForm } from './components/auth/AuthForm'
 import { ProjectDetail } from './components/ProjectDetail'
 import { LandingPage } from './components/LandingPage'
+import { Navigation } from './components/Navigation'
 import { useAuth } from './store/authContext'
 import { listProjects, createProject, getProject } from './services/project'
 import { createWorkspace } from './services/workspace'
@@ -363,7 +364,7 @@ function App() {
       <DarkModeToggle />
       <WorkspaceProvider>
         <BrowserRouter>
-          <NavBar />
+          <Navigation />
           <Routes>
             <Route path="/login" element={<AuthFormWithRedirect />} />
             <Route
