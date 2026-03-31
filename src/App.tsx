@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, Link } from 'react-router-dom'
 import { AuthForm } from './components/auth/AuthForm'
 import { ProjectDetail } from './components/ProjectDetail'
+import { LandingPage } from './components/LandingPage'
 import { useAuth } from './store/authContext'
 import { listProjects, createProject, getProject } from './services/project'
 import { createWorkspace } from './services/workspace'
@@ -369,7 +370,7 @@ function App() {
               path="/dashboard"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <LandingPage />
                 </ProtectedRoute>
               }
             />
