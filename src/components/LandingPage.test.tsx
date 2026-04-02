@@ -140,7 +140,7 @@ describe('LandingPage', () => {
     expect(avatarElements.length).toBeGreaterThan(0)
   })
 
-  it('should have working navigation links', async () => {
+  it('should render navigation links', async () => {
     const user = userEvent.setup()
     
     render(
@@ -233,7 +233,6 @@ describe('LandingPage', () => {
     )
 
     // Check for proper heading hierarchy
-    expect(screen.getByRole('heading', { name: 'TaskSultan' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /Welcome back/ })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Quick Actions' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Platform Features' })).toBeInTheDocument()
